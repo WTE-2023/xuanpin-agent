@@ -940,6 +940,14 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 20h16"></path></svg>
           <span class="btn-label">导出报告</span>
         </button>
+        <button class="btn btn-ghost" type="button" data-act="export-excel" title="导出多工作表 Excel 明细（成本 / 合规 / 风险 / 情报 / 台账汇总）">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M3 15h18M9 3v18M15 3v18"></path></svg>
+          <span class="btn-label">Excel 明细</span>
+        </button>
+        <button class="btn btn-ghost" type="button" data-act="print-report" title="生成 A4 打印友好版报告（白底黑字、分页控制）">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <span class="btn-label">打印报告</span>
+        </button>
         <button class="btn btn-primary" type="button" id="reanalyzeBtn" data-act="reanalyze">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"></path><path d="M20 4v4h-4"></path></svg>
           <span class="btn-label">重新分析</span>
@@ -4118,9 +4126,682 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     window.addEventListener('resize', function () { if (UI.chart) UI.chart.resize(); });
   }
 
-  window.IntelUI = { render: render, bind: bind };
+  // 当前产品情报数据集只读快照（供报告导出等外部模块使用；rows 为引用，勿修改）
+  function snapshot() {
+    var st = ds();
+    if (!st) return null;
+    return { comp: st.comp, kw: st.kw, rev: st.rev };
+  }
+
+  window.IntelUI = { render: render, bind: bind, snapshot: snapshot };
 })();
 
+</script>
+<script>/* inlined: ./assets/report.js */
+// assets/report.js — 报告可交付化：Excel 明细导出（XML Spreadsheet 2003）+ A4 打印友好版
+// 依赖：window.XPApp.reportData() 提供数据包；window.Intel 提供情报分析函数（可选）
+// 设计要点：
+//   1. Excel 用 XML Spreadsheet 2003 格式（.xls）：单文件零依赖，Excel / WPS 直接打开，多工作表。
+//   2. 打印版用独立窗口 + A4 样式：白底黑字、分页控制、含完整风险提示与免责声明。
+//   3. 所有数字保留证据强度标注；示例数据单独标记；不含任何点位预测，不构成投资建议。
+(function () {
+  'use strict';
+
+  /* ============================================================
+     0. 通用工具
+     ============================================================ */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  // XML 转义：额外剥掉 XML 1.0 不允许的控制字符，避免 Excel 打开报错
+  function xesc(s) {
+    return String(s == null ? '' : s)
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  }
+  // 去掉 HTML 标签（调整杠杆等字段内含 <strong>，Excel 中只保留文字）
+  function stripHtml(s) {
+    return String(s == null ? '' : s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  }
+  function toast(msg) {
+    var el = $('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.classList.remove('show'); }, 2600);
+  }
+  function downloadFile(name, content, mime) {
+    var blob = new Blob([content], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 0);
+  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function fileStamp(ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes());
+  }
+  function fmtTime(ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function yuan(n) { return '¥' + Math.round(n).toLocaleString('en-US'); }
+  function pctTxt(n) { return (typeof n === 'number' && isFinite(n)) ? n.toFixed(1) + '%' : '—'; }
+  function safeName(s) { return String(s || 'report').replace(/[\\/:*?"<>|]/g, '_').slice(0, 60); }
+
+  var DISCLAIMER = '本报告中的平台费率、关税税率、FBA 费用、仓储费、认证周期与成本均为公开规则或行业均值推算的估算值（证据强度已逐项标注），' +
+    '不保证与官方账单完全一致。本报告不构成法律意见、税务意见或投资建议，不含任何价格点位预测；知识产权初筛不替代代理机构的正式检索。' +
+    '请在正式投入前以官方最新公告、供应商实际报价与专业机构意见核对。';
+  var EV_LEGEND = '证据强度图例：公开数据=平台公开页/官方公告/政府公开库；付费第三方=Keepa/卖家精灵等第三方工具导出；' +
+    '用户导入=用户上传的报价单/成本表；估算/规则库=按公开费率规则或行业均值推算，须自行核对。';
+
+  /* ============================================================
+     1. Excel 明细导出（XML Spreadsheet 2003，多工作表）
+     ============================================================ */
+  function cell(v, style) {
+    var t = 'String', val = v;
+    if (typeof v === 'number') {
+      if (isFinite(v)) { t = 'Number'; } else { val = '—'; }
+    }
+    return '<Cell' + (style ? ' ss:StyleID="' + style + '"' : '') +
+      '><Data ss:Type="' + t + '">' + xesc(val) + '</Data></Cell>';
+  }
+  function row(cells) { return '<Row>' + cells.join('') + '</Row>'; }
+  function blankRow() { return '<Row/>'; }
+  // 表头行（统一样式）
+  function headRow(labels) {
+    return '<Row>' + labels.map(function (t) { return cell(t, 'sHead'); }).join('') + '</Row>';
+  }
+  function sheetOpen(name, colWidths) {
+    var cols = colWidths.map(function (w) { return '<Column ss:Width="' + w + '"/>'; }).join('');
+    return '<Worksheet ss:Name="' + xesc(name) + '"><Table>' + cols;
+  }
+  function sheetFoot(rows) {
+    return rows + blankRow() +
+      row([cell('免责声明', 'sSub')]) +
+      row([cell(DISCLAIMER, 'sWarn')]) +
+      row([cell(EV_LEGEND, 'sMeta')]) +
+      '</Table></Worksheet>';
+  }
+
+  var STYLES =
+    '<Styles>' +
+    '<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/>' +
+      '<Font ss:FontName="Microsoft YaHei" ss:Size="10"/></Style>' +
+    '<Style ss:ID="sTitle"><Font ss:FontName="Microsoft YaHei" ss:Size="14" ss:Bold="1"/></Style>' +
+    '<Style ss:ID="sSub"><Font ss:FontName="Microsoft YaHei" ss:Size="11" ss:Bold="1" ss:Color="#1e3a5f"/></Style>' +
+    '<Style ss:ID="sMeta"><Font ss:FontName="Microsoft YaHei" ss:Size="9" ss:Color="#666666"/></Style>' +
+    '<Style ss:ID="sHead"><Interior ss:Color="#1e3a5f" ss:Pattern="Solid"/>' +
+      '<Font ss:FontName="Microsoft YaHei" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/>' +
+      '<Alignment ss:Vertical="Center" ss:WrapText="1"/></Style>' +
+    '<Style ss:ID="sNum"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="#,##0"/></Style>' +
+    '<Style ss:ID="sDec"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="#,##0.00"/></Style>' +
+    '<Style ss:ID="sMoney"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="&quot;¥&quot;#,##0"/></Style>' +
+    '<Style ss:ID="sUsd"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="&quot;$&quot;#,##0.00"/></Style>' +
+    '<Style ss:ID="sPct"><Alignment ss:Horizontal="Right" ss:Vertical="Center"/><NumberFormat ss:Format="0.0&quot;%&quot;"/></Style>' +
+    '<Style ss:ID="sWrap"><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>' +
+    '<Style ss:ID="sGood"><Font ss:FontName="Microsoft YaHei" ss:Size="10" ss:Bold="1" ss:Color="#16a34a"/></Style>' +
+    '<Style ss:ID="sBad"><Font ss:FontName="Microsoft YaHei" ss:Size="10" ss:Bold="1" ss:Color="#dc2626"/></Style>' +
+    '<Style ss:ID="sWarn"><Font ss:FontName="Microsoft YaHei" ss:Size="9" ss:Color="#b45309"/>' +
+      '<Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>' +
+    '</Styles>';
+
+  /* ---------------- Sheet 1：结论总览 ---------------- */
+  function sheetSummary(d) {
+    var s = sheetOpen('结论总览', [150, 130, 90, 320]);
+    s += row([cell(d.product.name + ' · 选品分析报告（Excel 明细）', 'sTitle')]);
+    s += row([cell('品类：' + d.product.category + ' · 目标市场：' + d.market.name + '（' + d.market.cur + '） · 生成时间：' + fmtTime(d.generatedAt), 'sMeta')]);
+    s += blankRow();
+
+    s += row([cell('一、核心结论', 'sSub')]);
+    s += headRow(['指标', '数值', '证据强度', '说明']);
+    s += row([cell('实测综合评分'), cell(d.score.overall, 'sNum'), cell('估算/规则库'), cell('按当前市场、费率与参数实测复核，非画像基准分', 'sWrap')]);
+    s += row([cell('实测复核结论'), cell(d.score.label, d.score.level === 'recommend' ? 'sGood' : (d.score.level === 'observe' ? 'sWarn' : 'sBad')), cell('估算/规则库'), cell(d.score.note ? stripHtml(d.score.note) : '', 'sWrap')]);
+    s += row([cell('实测毛利率'), cell(d.profit.margin, 'sPct'), cell('估算/规则库'), cell('已含 FBA、仓储、关税' + (d.market.key === 'US' ? '与 301 加征' : ''), 'sWrap')]);
+    s += row([cell('单件毛利'), cell(d.profit.profit, 'sMoney'), cell('估算/规则库'), cell('', 'sWrap')]);
+    s += row([cell('AI 初始结论（画像基准）'), cell(d.product.rec.badge), cell('估算/规则库'), cell('画像基准评分 ' + d.product.overall + '，与实测不一致时以实测为准', 'sWrap')]);
+    s += blankRow();
+
+    s += row([cell('二、维度评分（实测）', 'sSub')]);
+    s += headRow(['维度', '得分', '权重', '说明']);
+    d.score.dims.forEach(function (dim) {
+      s += row([cell(dim.label), cell(dim.score, 'sNum'), cell(dim.weight, 'sNum'), cell(dim.note, 'sWrap')]);
+    });
+    s += blankRow();
+
+    s += row([cell('三、调整杠杆', 'sSub')]);
+    d.score.levers.forEach(function (t, i) {
+      s += row([cell('杠杆 ' + (i + 1)), cell(stripHtml(t), 'sWrap')]);
+    });
+    s += blankRow();
+
+    s += row([cell('四、核心优势 / 运营建议', 'sSub')]);
+    d.product.rec.strengths.forEach(function (t) { s += row([cell('优势'), cell(t, 'sWrap')]); });
+    (d.product.rec.prerequisites || []).forEach(function (t) { s += row([cell('前置条件'), cell(t, 'sWrap')]); });
+    d.product.rec.advice.forEach(function (t) { s += row([cell('运营建议'), cell(t, 'sWrap')]); });
+    d.product.rec.next.forEach(function (t, i) { s += row([cell('下一步 ' + (i + 1)), cell(t, 'sWrap')]); });
+
+    return sheetFoot(s);
+  }
+
+  /* ---------------- Sheet 2：利润成本明细 ---------------- */
+  function sheetProfit(d) {
+    var p = d.profit;
+    var s = sheetOpen('利润成本明细', [180, 110, 90, 100, 300]);
+    s += row([cell('利润与现金流明细（目标市场：' + d.market.name + '）', 'sTitle')]);
+    s += row([cell('单位：人民币元 · 生成时间：' + fmtTime(d.generatedAt), 'sMeta')]);
+    s += blankRow();
+
+    s += row([cell('一、核心指标', 'sSub')]);
+    s += headRow(['指标', '数值', '', '指标', '数值']);
+    function kpis() {
+      return [
+        ['售价', p.inputs.price, '到岸成本（含关税）', p.landed],
+        ['单件总成本', p.totalCost, '单件毛利', p.profit],
+        ['毛利率 %', p.margin, '保本 ACOS %', isFinite(p.breakevenAcos) ? p.breakevenAcos : null],
+        ['资金周转（次/年）', p.turnsPerYear, '资金周转天数', p.cycleDays],
+        ['首批备货资金占用', p.cashTied, '其中可抵扣进口增值税', p.vatRecoverable],
+        ['月净利（扣月固定成本）', p.monthlyProfit, '年化 ROI %', p.roi > 0 ? p.roi : null],
+        ['25% 目标毛利所需售价', isFinite(p.priceForTarget) ? p.priceForTarget : null, '可承受最高采购价', isFinite(p.purchaseMax) ? p.purchaseMax : null],
+        ['FBA 分段', p.fbaTier, '', null]
+      ];
+    }
+    kpis().forEach(function (pair) {
+      var v1 = pair[1], v2 = pair[3];
+      s += row([
+        cell(pair[0]),
+        typeof v1 === 'number' ? cell(v1, 'sMoney') : cell(v1 == null ? '—' : v1),
+        cell(''),
+        cell(pair[2]),
+        typeof v2 === 'number' ? cell(v2, 'sMoney') : cell(v2 == null ? '—' : v2)
+      ]);
+    });
+    s += blankRow();
+
+    s += row([cell('二、成本明细（逐项标注证据强度）', 'sSub')]);
+    s += headRow(['成本项', '金额（¥）', '占售价（%）', '证据强度', '数据来源']);
+    p.items.forEach(function (it) {
+      s += row([
+        cell(it.name),
+        cell(it.amount, 'sMoney'),
+        cell(it.amount / p.inputs.price * 100, 'sPct'),
+        cell(it.evidenceLabel),
+        cell(it.src, 'sWrap')
+      ]);
+    });
+    s += row([cell('合计', 'sSub'), cell(p.totalCost, 'sMoney'), cell(p.totalCost / p.inputs.price * 100, 'sPct'), cell(''), cell('', 'sWrap')]);
+    s += blankRow();
+
+    s += row([cell('三、测算参数快照', 'sSub')]);
+    s += headRow(['参数', '数值', '', '参数', '数值']);
+    var inp = p.inputs;
+    var params = [
+      ['采购价（¥）', inp.purchase, '包材成本（¥）', inp.pack],
+      ['包装尺寸（cm）', inp.dimL + '×' + inp.dimW + '×' + inp.dimH, '实重（g）', inp.weightG],
+      ['平台佣金率 %', inp.commissionRate * 100, '广告 ACOS %', inp.acosRate * 100],
+      ['退货率 %', inp.returnRate * 100, '关税税率 %', inp.dutyRate * 100],
+      ['301 加征 %', inp.s301 != null ? inp.s301 * 100 : null, '月销量预估（件）', inp.monthlySales],
+      ['备货天数', inp.stockDays, '回款周期（天）', inp.payCycleDays]
+    ];
+    params.forEach(function (pair) {
+      s += row([
+        cell(pair[0]), cell(pair[1] == null ? '—' : pair[1], typeof pair[1] === 'number' ? 'sDec' : ''),
+        cell(''),
+        cell(pair[2]), cell(pair[3] == null ? '—' : pair[3], typeof pair[3] === 'number' ? 'sDec' : '')
+      ]);
+    });
+    s += row([cell('头程方式'), cell(inp.freightMode), cell(''), cell(''), cell('')]);
+
+    return sheetFoot(s);
+  }
+
+  /* ---------------- Sheet 3：合规认证清单 ---------------- */
+  function sheetCompliance(d) {
+    var s = sheetOpen('合规认证清单', [200, 80, 110, 100, 100, 340]);
+    s += row([cell('合规与认证矩阵（' + d.market.name + ' · ' + d.product.category + '）', 'sTitle')]);
+    s += row([cell('周期与成本为行业均值估算，须以认证机构实际报价为准', 'sMeta')]);
+    s += blankRow();
+    s += headRow(['认证 / 法规', '性质', '周期', '成本下限（¥）', '成本上限（¥）', '合规义务']);
+    var mandN = 0;
+    d.compliance.forEach(function (c) {
+      if (c.mand) mandN++;
+      s += row([
+        cell(c.name),
+        cell(c.mand ? '强制' : '建议', c.mand ? 'sBad' : ''),
+        cell(c.weeks),
+        cell(c.costLo, 'sMoney'),
+        cell(c.costHi, 'sMoney'),
+        cell(c.duty, 'sWrap')
+      ]);
+    });
+    s += blankRow();
+    s += row([cell('强制项合计 ' + mandN + ' / ' + d.compliance.length + ' 项；认证总成本约 ¥' +
+      d.compliance.reduce(function (a, c) { return a + c.costLo; }, 0).toLocaleString('en-US') + ' – ¥' +
+      d.compliance.reduce(function (a, c) { return a + c.costHi; }, 0).toLocaleString('en-US'), 'sWarn')]);
+    return sheetFoot(s);
+  }
+
+  /* ---------------- Sheet 4：风险清单 ---------------- */
+  function sheetRisk(d) {
+    var s = sheetOpen('风险清单', [200, 70, 380, 200]);
+    s += row([cell('知识产权初筛与风险提示', 'sTitle')]);
+    s += blankRow();
+    s += row([cell('一、知识产权风险初筛', 'sSub')]);
+    s += headRow(['指标', '数值', '说明', '']);
+    s += row([cell('近似风险评分'), cell(d.ip.score, 'sNum'), cell(d.ip.density + '密度品类 · ' + d.ip.conclusion, 'sWrap'), cell('')]);
+    s += row([cell('初筛说明'), cell(d.ip.note, 'sWrap'), cell(''), cell('')]);
+    s += row([cell('提示', 'sBad'), cell('初筛不替代代理机构正式 FTO 检索，上架前建议委托专业机构出具意见', 'sWrap'), cell(''), cell('')]);
+    s += blankRow();
+    s += row([cell('二、风险清单（共 ' + d.product.risks.length + ' 项）', 'sSub')]);
+    s += headRow(['风险项', '等级', '说明', '来源']);
+    d.product.risks.forEach(function (r) {
+      s += row([
+        cell(r.title),
+        cell(r.levelLabel, r.level === 'high' ? 'sBad' : (r.level === 'mid' ? 'sWarn' : '')),
+        cell(r.desc, 'sWrap'),
+        cell(r.src, 'sWrap')
+      ]);
+    });
+    return sheetFoot(s);
+  }
+
+  /* ---------------- Sheet 5：竞品情报（有数据时生成） ---------------- */
+  function srcLabel(source) { return source === 'imp' ? '用户导入' : '示例（仅体验，勿用于决策）'; }
+
+  function sheetIntel(d) {
+    var it = d.intel;
+    if (!it || (!it.comp && !it.kw && !it.rev)) return '';
+    var hasImp = (it.comp && it.comp.source === 'imp') || (it.kw && it.kw.source === 'imp') || (it.rev && it.rev.source === 'imp');
+    var s = sheetOpen('竞品情报', [170, 110, 110, 110, 260]);
+
+    s += row([cell('竞品与关键词情报结论', 'sTitle')]);
+    s += row([cell('分析结果按统一规则确定性生成，可复算；示例数据仅用于体验流程', 'sMeta')]);
+    s += blankRow();
+
+    if (it.comp) {
+      var a = window.Intel.compAnalysis(it.comp.rows);
+      s += row([cell('一、市场格局与价格带（来源：' + srcLabel(it.comp.source) + ' · ' + it.comp.time + '）', 'sSub')]);
+      s += headRow(['指标', '数值', '', '指标', '数值']);
+      s += row([cell('样本 Listing 数'), cell(a.n, 'sNum'), cell(''), cell('有销量 Listing 数'), cell(a.saledN, 'sNum')]);
+      s += row([cell('价格中位数'), cell(a.medianPrice, 'sUsd'), cell(''), cell('平均评分'), cell(a.avgRating != null ? Math.round(a.avgRating * 100) / 100 : '—', 'sDec')]);
+      s += row([cell('CR4（前4品牌销量份额）%'), cell(a.cr4, 'sPct'), cell(''), cell('CR8 %'), cell(a.cr8, 'sPct')]);
+      s += row([cell('HHI（赫芬达尔指数）'), cell(Math.round(a.hhi), 'sNum'), cell(''),
+        cell('集中度判断'), cell(a.hhi > 2500 ? '高集中：头部垄断，进入需谨慎' : (a.hhi > 1500 ? '中度集中：差异化可切入' : '低集中：格局分散，机会较多'), 'sWrap')]);
+      s += blankRow();
+      s += row([cell('价格带分布（销量口径主销带：' + (a.topBand ? '$' + a.topBand.lo + ' – $' + a.topBand.hi : '—') + '）', 'sSub')]);
+      s += headRow(['价格带', 'Listing 数', '销量合计', '销量份额（%）', '']);
+      a.bands.forEach(function (b) {
+        s += row([
+          cell('$' + b.lo + ' – $' + b.hi),
+          cell(b.count, 'sNum'),
+          cell(b.sales, 'sNum'),
+          cell(a.totalSales ? b.sales / a.totalSales * 100 : 0, 'sPct'),
+          cell(a.topBand && b.lo === a.topBand.lo ? '主销价格带' : '')
+        ]);
+      });
+      if (a.brands && a.brands.length) {
+        s += blankRow();
+        s += row([cell('头部品牌（按销量，最多 8 个）', 'sSub')]);
+        s += headRow(['品牌', '销量', '份额（%）', '', '']);
+        a.brands.forEach(function (b) {
+          s += row([cell(b.brand), cell(b.sales, 'sNum'), cell(b.share, 'sPct'), cell(''), cell('')]);
+        });
+      }
+      s += blankRow();
+    }
+
+    if (it.kw) {
+      var k = window.Intel.kwAnalysis(it.kw.rows);
+      s += row([cell('二、关键词机会（来源：' + srcLabel(it.kw.source) + ' · ' + it.kw.time + '）', 'sSub')]);
+      s += row([cell('机会分 = 月搜索量 ÷（竞争商品数 + 1），归一化到 0–100；≥40 机会词 / ≥12 关注 / 其余红海', 'sMeta')]);
+      s += headRow(['关键词', '月搜索量', '竞争商品数', 'CPC（$）', '机会分 / 分级']);
+      k.list.forEach(function (o) {
+        s += row([
+          cell(o.keyword),
+          cell(o.sv, 'sNum'),
+          cell(o.competing != null ? o.competing : '—', o.competing != null ? 'sNum' : ''),
+          cell(o.cpc != null ? o.cpc : '—', o.cpc != null ? 'sUsd' : ''),
+          cell(o.index + ' · ' + o.grade, o.grade === '机会词' ? 'sGood' : (o.grade === '红海' ? 'sBad' : ''))
+        ]);
+      });
+      s += blankRow();
+    }
+
+    if (it.rev) {
+      var v = window.Intel.revAnalysis(it.rev.rows);
+      s += row([cell('三、Review 痛点聚类（来源：' + srcLabel(it.rev.source) + ' · ' + it.rev.time + '）', 'sSub')]);
+      s += row([cell('评论 ' + v.n + ' 条，其中 ≤3 分低分 ' + v.lowN + ' 条（低分率 ' + v.lowRate.toFixed(1) + '%）；按 12 类痛点词典命中聚类，可多归', 'sMeta')]);
+      s += headRow(['痛点类别', '命中次数', '占低分评论比（%）', '典型低分原文（摘录）', '']);
+      v.clusters.forEach(function (c) {
+        s += row([
+          cell(c.label),
+          cell(c.count, 'sNum'),
+          cell(c.pct, 'sPct'),
+          cell((c.samples || []).join(' ／ '), 'sWrap'),
+          cell('')
+        ]);
+      });
+      s += blankRow();
+    }
+
+    if (!hasImp) {
+      s += row([cell('当前全部为内置示例数据，仅用于体验交互流程，不代表真实市场，请勿写入决策依据', 'sBad')]);
+    }
+    return sheetFoot(s);
+  }
+
+  /* ---------------- Sheet 6：台账汇总 ---------------- */
+  var DEC_LABEL = { evaluating: '待评估', sampling: '已取样/试销', ordered: '已下单', dropped: '已放弃' };
+
+  function sheetLedger(d) {
+    var s = sheetOpen('台账汇总', [150, 90, 90, 80, 60, 120, 90, 90, 80, 90, 90, 90, 70, 150, 90, 90, 110, 200]);
+    s += row([cell('选品决策台账汇总（共 ' + d.ledger.length + ' 条）', 'sTitle')]);
+    s += row([cell('快照为保存时刻的规则库估算值，规则库升级后历史快照不会重算；请以最新版本为准', 'sMeta')]);
+    s += blankRow();
+    if (!d.ledger.length) {
+      s += row([cell('台账为空：在分析页点击「存为台账」后，记录将在此汇总', 'sWarn')]);
+      return sheetFoot(s);
+    }
+    s += headRow(['产品', '品类', '市场', '决策', '版本', '保存时间', '售价（¥）', '到岸成本（¥）', '毛利率（%）',
+      '单件毛利（¥）', '保本ACOS（%）', '月净利（¥）', 'ROI（%）', '实测结论', '知产评分', '高/中风险', '证据（导入/估算）', '备注']);
+    d.ledger.forEach(function (rec) {
+      var sn = rec.snap || {};
+      s += row([
+        cell(rec.name),
+        cell(rec.category || ''),
+        cell(sn.marketName || rec.market || ''),
+        cell(DEC_LABEL[rec.decision] || rec.decision || ''),
+        cell(((rec.history || []).length + 1), 'sNum'),
+        cell(fmtTime(rec.updatedAt || sn.ts || Date.now())),
+        cell(sn.price != null ? sn.price : '—', sn.price != null ? 'sMoney' : ''),
+        cell(sn.landed != null ? sn.landed : '—', sn.landed != null ? 'sMoney' : ''),
+        cell(sn.margin != null ? sn.margin : '—', sn.margin != null ? 'sPct' : ''),
+        cell(sn.profit != null ? sn.profit : '—', sn.profit != null ? 'sMoney' : ''),
+        cell(isFinite(sn.breakevenAcos) ? sn.breakevenAcos : '—', isFinite(sn.breakevenAcos) ? 'sPct' : ''),
+        cell(sn.monthlyProfit != null ? sn.monthlyProfit : '—', sn.monthlyProfit != null ? 'sMoney' : ''),
+        cell(sn.roi > 0 ? sn.roi : '—', sn.roi > 0 ? 'sPct' : ''),
+        cell((sn.overall != null ? sn.overall + ' 分 · ' : '') + (sn.verdictLabel || ''), 'sWrap'),
+        cell(sn.ipScore != null ? sn.ipScore : '—', sn.ipScore != null ? 'sNum' : ''),
+        cell((sn.highRisks || 0) + ' / ' + (sn.midRisks || 0)),
+        cell(sn.evidenceCount ? ('导入 ' + sn.evidenceCount.imp + ' / 估算 ' + sn.evidenceCount.est) : '—'),
+        cell(rec.note || '', 'sWrap')
+      ]);
+    });
+    return sheetFoot(s);
+  }
+
+  function exportExcel(d) {
+    var sheets = [sheetSummary(d), sheetProfit(d), sheetCompliance(d), sheetRisk(d)];
+    var intelSheet = sheetIntel(d);
+    if (intelSheet) sheets.push(intelSheet);
+    sheets.push(sheetLedger(d));
+
+    var xml = '﻿<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<?mso-application progid="Excel.Sheet"?>\n' +
+      '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ' +
+      'xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+      'xmlns:x="urn:schemas-microsoft-com:office:excel" ' +
+      'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" ' +
+      'xmlns:html="http://www.w3.org/TR/REC-html40">' +
+      STYLES +
+      sheets.join('') +
+      '</Workbook>';
+
+    var fname = safeName(d.product.name) + '-选品分析明细-' + fileStamp(d.generatedAt) + '.xls';
+    downloadFile(fname, xml, 'application/vnd.ms-excel;charset=utf-8');
+    toast('已导出 Excel 明细（' + sheets.length + ' 个工作表），可用 Excel / WPS 直接打开');
+  }
+
+  /* ============================================================
+     2. A4 打印友好版报告
+     ============================================================ */
+  function printStyles() {
+    return '<style>' +
+      '@page{size:A4;margin:16mm 14mm 18mm}' +
+      '*{box-sizing:border-box}' +
+      'body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#111;background:#fff;font-size:10.5pt;line-height:1.65;margin:0;padding:24px 28px}' +
+      '.phead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2.5px solid #111;padding-bottom:8px;margin-bottom:14px}' +
+      '.phead h1{font-size:19pt;margin:0 0 2px}' +
+      '.phead .sub{font-size:9pt;color:#444}' +
+      '.phead .right{text-align:right;font-size:8.5pt;color:#444}' +
+      '.alert{border:1.5px solid #111;padding:9px 12px;font-size:9pt;margin:10px 0 4px;page-break-inside:avoid}' +
+      '.alert b{display:block;margin-bottom:3px}' +
+      'h2{font-size:13pt;margin:20px 0 8px;padding:4px 8px;border-left:5px solid #111;background:#f0f0f0;page-break-after:avoid}' +
+      'h3{font-size:10.5pt;margin:12px 0 4px;page-break-after:avoid}' +
+      'table{width:100%;border-collapse:collapse;font-size:8.8pt;margin:6px 0;page-break-inside:auto}' +
+      'th{border:0.7pt solid #666;background:#e8e8e8;padding:4.5px 6px;text-align:left;font-weight:bold}' +
+      'td{border:0.7pt solid #999;padding:4.5px 6px;vertical-align:top}' +
+      'tr{page-break-inside:avoid}' +
+      '.n{text-align:right;font-variant-numeric:tabular-nums}' +
+      '.s{color:#555;font-size:8.2pt}' +
+      '.kpi{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;page-break-inside:avoid}' +
+      '.kpi div{flex:1 1 105px;border:1pt solid #666;padding:6px 8px}' +
+      '.kpi span{font-size:8pt;color:#555;display:block}' +
+      '.kpi b{font-size:13pt}' +
+      '.verdict{border:1.5pt solid #111;padding:10px 14px;margin:10px 0;page-break-inside:avoid}' +
+      '.verdict .v{font-size:13pt;font-weight:bold}' +
+      'ul,ol{padding-left:18px;font-size:9pt;margin:5px 0}' +
+      '.pb{page-break-before:always}' +
+      '.foot{margin-top:22px;border-top:1pt solid #666;padding-top:8px;font-size:8pt;color:#444}' +
+      '.disc{font-size:8.6pt;border:1pt solid #666;padding:9px 12px;margin-top:10px;page-break-inside:avoid}' +
+      '@media print{body{padding:0}.kpi div,th,td,h2{print-color-adjust:exact;-webkit-print-color-adjust:exact}}' +
+      '</style>';
+  }
+
+  function printHtml(d) {
+    var p = d.profit;
+    var intelBlock = '';
+
+    /* ---- 情报块（仅用户导入数据出具结论；示例数据只提示） ---- */
+    if (d.intel && (d.intel.comp || d.intel.kw || d.intel.rev)) {
+      var parts = [];
+      var hasImp = false;
+      if (d.intel.comp) {
+        var a = window.Intel.compAnalysis(d.intel.comp.rows);
+        var imp = d.intel.comp.source === 'imp';
+        if (imp) hasImp = true;
+        parts.push('<h3>市场格局与价格带（' + (imp ? '用户导入' : '<b>示例数据</b>') + ' · ' + esc(d.intel.comp.time) + '）</h3>' +
+          '<table><thead><tr><th>指标</th><th class="n">数值</th><th>指标</th><th class="n">数值</th></tr></thead><tbody>' +
+          '<tr><td>样本 Listing 数 / 有销量</td><td class="n">' + a.n + ' / ' + a.saledN + '</td>' +
+          '<td>价格中位数 / 平均评分</td><td class="n">' + (a.medianPrice != null ? '$' + a.medianPrice.toFixed(2) : '—') + ' / ' + (a.avgRating != null ? a.avgRating.toFixed(2) : '—') + '</td></tr>' +
+          '<tr><td>CR4 / CR8</td><td class="n">' + a.cr4.toFixed(1) + '% / ' + a.cr8.toFixed(1) + '%</td>' +
+          '<td>HHI / 集中度</td><td class="n">' + Math.round(a.hhi) + ' / ' + (a.hhi > 2500 ? '高集中' : a.hhi > 1500 ? '中度集中' : '低集中') + '</td></tr>' +
+          '<tr><td>主销价格带（销量口径）</td><td class="n">' + (a.topBand ? '$' + a.topBand.lo + ' – $' + a.topBand.hi : '—') + '</td>' +
+          '<td>头部品牌数</td><td class="n">' + a.brandN + '</td></tr>' +
+          '</tbody></table>');
+      }
+      if (d.intel.kw) {
+        var k = window.Intel.kwAnalysis(d.intel.kw.rows);
+        var imp2 = d.intel.kw.source === 'imp';
+        if (imp2) hasImp = true;
+        parts.push('<h3>关键词机会 Top 10（' + (imp2 ? '用户导入' : '<b>示例数据</b>') + '）</h3>' +
+          '<table><thead><tr><th>关键词</th><th class="n">月搜索量</th><th class="n">竞争商品数</th><th class="n">CPC</th><th>机会分 / 分级</th></tr></thead><tbody>' +
+          k.list.slice(0, 10).map(function (o) {
+            return '<tr><td>' + esc(o.keyword) + '</td><td class="n">' + o.sv.toLocaleString('en-US') + '</td>' +
+              '<td class="n">' + (o.competing != null ? o.competing.toLocaleString('en-US') : '—') + '</td>' +
+              '<td class="n">' + (o.cpc != null ? '$' + o.cpc.toFixed(2) : '—') + '</td>' +
+              '<td>' + o.index + ' · ' + o.grade + '</td></tr>';
+          }).join('') + '</tbody></table>');
+      }
+      if (d.intel.rev) {
+        var v = window.Intel.revAnalysis(d.intel.rev.rows);
+        var imp3 = d.intel.rev.source === 'imp';
+        if (imp3) hasImp = true;
+        parts.push('<h3>Review 痛点聚类（' + (imp3 ? '用户导入' : '<b>示例数据</b>') + ' · 低分率 ' + v.lowRate.toFixed(1) + '%）</h3>' +
+          '<table><thead><tr><th>痛点类别</th><th class="n">命中次数</th><th class="n">占低分评论比</th></tr></thead><tbody>' +
+          v.clusters.slice(0, 8).map(function (c) {
+            return '<tr><td>' + esc(c.label) + '</td><td class="n">' + c.count + '</td><td class="n">' + c.pct.toFixed(1) + '%</td></tr>';
+          }).join('') + '</tbody></table>');
+      }
+      intelBlock = '<h2 class="pb">五、竞品与关键词情报</h2>' +
+        (hasImp ? '' : '<p class="s">当前为内置示例数据，仅用于体验交互流程，不代表真实市场，请勿作为决策依据。</p>') +
+        parts.join('');
+    }
+
+    /* ---- 台账块 ---- */
+    var ledgerBlock = '';
+    if (d.ledger.length) {
+      ledgerBlock = '<h2 class="pb">六、选品决策台账摘要（共 ' + d.ledger.length + ' 条）</h2>' +
+        '<table><thead><tr><th>产品</th><th>市场</th><th>决策</th><th class="n">版本</th><th class="n">毛利率</th>' +
+        '<th class="n">单件毛利</th><th class="n">月净利</th><th class="n">评分</th><th>高/中风险</th><th>保存时间</th></tr></thead><tbody>' +
+        d.ledger.map(function (rec) {
+          var sn = rec.snap || {};
+          return '<tr><td>' + esc(rec.name) + '</td><td>' + esc(sn.marketName || rec.market || '') + '</td>' +
+            '<td>' + esc(DEC_LABEL[rec.decision] || '') + '</td>' +
+            '<td class="n">' + ((rec.history || []).length + 1) + '</td>' +
+            '<td class="n">' + (sn.margin != null ? pctTxt(sn.margin) : '—') + '</td>' +
+            '<td class="n">' + (sn.profit != null ? yuan(sn.profit) : '—') + '</td>' +
+            '<td class="n">' + (sn.monthlyProfit != null ? yuan(sn.monthlyProfit) : '—') + '</td>' +
+            '<td class="n">' + (sn.overall != null ? sn.overall : '—') + '</td>' +
+            '<td>' + (sn.highRisks || 0) + ' / ' + (sn.midRisks || 0) + '</td>' +
+            '<td class="s">' + fmtTime(rec.updatedAt || Date.now()) + '</td></tr>';
+        }).join('') + '</tbody></table>' +
+        '<p class="s">快照为保存时刻的规则库估算值，规则库升级后历史快照不会重算。完整 21 项指标请使用「Excel 明细」导出的台账汇总表。</p>';
+    }
+
+    /* ---- 维度评分表 ---- */
+    var dimRows = d.score.dims.map(function (dim) {
+      return '<tr><td>' + esc(dim.label) + '</td><td class="n">' + dim.score + '</td><td class="n">' + dim.weight + '</td><td class="s">' + esc(dim.note) + '</td></tr>';
+    }).join('');
+
+    /* ---- 成本明细表 ---- */
+    var costRows = p.items.map(function (it) {
+      return '<tr><td>' + esc(it.name) + '</td><td class="n">' + yuan(it.amount) + '</td>' +
+        '<td class="n">' + (it.amount / p.inputs.price * 100).toFixed(1) + '%</td>' +
+        '<td>' + esc(it.evidenceLabel) + '</td><td class="s">' + esc(it.src) + '</td></tr>';
+    }).join('');
+
+    /* ---- 合规表 ---- */
+    var certRows = d.compliance.map(function (c) {
+      return '<tr><td>' + esc(c.name) + '</td><td>' + (c.mand ? '<b>强制</b>' : '建议') + '</td>' +
+        '<td>' + esc(c.weeks) + '</td><td class="n">' + yuan(c.costLo) + ' – ' + yuan(c.costHi) + '</td>' +
+        '<td class="s">' + esc(c.duty) + '</td></tr>';
+    }).join('');
+
+    /* ---- 风险表 ---- */
+    var riskRows = d.product.risks.map(function (r) {
+      return '<tr><td>' + esc(r.title) + '</td><td>' + (r.level === 'high' ? '<b>' : '') + esc(r.levelLabel) + (r.level === 'high' ? '</b>' : '') + '</td>' +
+        '<td>' + esc(r.desc) + '</td><td class="s">' + esc(r.src) + '</td></tr>';
+    }).join('');
+
+    /* ---- 数据来源表 ---- */
+    var dataRows = d.imports.length
+      ? d.imports.map(function (x) {
+          return '<tr><td>' + esc(x.template) + '</td><td class="n">' + x.mapped + '</td><td class="n">' + x.rows + '</td>' +
+            '<td class="s">' + esc(x.fields) + '</td><td class="s">' + esc(x.time) + '</td></tr>';
+        }).join('')
+      : '<tr><td colspan="5" class="s">无导入数据，全部数值为估算 / 规则库强度</td></tr>';
+
+    return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">' +
+      '<title>' + esc(d.product.name) + ' 选品分析报告（打印版）</title>' + printStyles() + '</head><body>' +
+
+      '<div class="phead"><div><h1>' + esc(d.product.name) + '</h1>' +
+      '<div class="sub">选品分析报告（打印版） · 品类：' + esc(d.product.category) + ' · 目标市场：' + esc(d.market.name) + '（' + d.market.cur + '）</div></div>' +
+      '<div class="right">选品智能体 · 跨境电商选品专业版<br>生成时间：' + fmtTime(d.generatedAt) + '<br>离线单机生成 · 数据未上传云端</div></div>' +
+
+      '<div class="alert"><b>重要提示</b>' + DISCLAIMER + '</div>' +
+
+      '<h2>一、机会评分与结论</h2>' +
+      '<div class="kpi">' +
+      '<div><span>实测综合评分</span><b>' + d.score.overall + '</b></div>' +
+      '<div><span>画像基准评分</span><b>' + d.product.overall + '</b></div>' +
+      '<div><span>实测毛利率</span><b>' + pctTxt(p.margin) + '</b></div>' +
+      '<div><span>单件毛利</span><b>' + yuan(p.profit) + '</b></div>' +
+      '<div><span>保本 ACOS</span><b>' + (isFinite(p.breakevenAcos) ? pctTxt(p.breakevenAcos) : '—') + '</b></div>' +
+      '<div><span>高风险项</span><b>' + d.product.risks.filter(function (r) { return r.level === 'high'; }).length + ' 项</b></div>' +
+      '</div>' +
+      '<div class="verdict"><span class="v">' + esc(d.score.label) + '</span>' +
+      '<div class="s">' + d.score.note + '</div>' +
+      '<div style="margin-top:6px"><b>调整杠杆：</b><ol style="margin:4px 0">' +
+      d.score.levers.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ol></div></div>' +
+      '<p style="font-size:9pt">' + esc(d.product.summary) + '</p>' +
+      '<p class="s">AI 初始结论（画像基准数据）：' + esc(d.product.rec.badge) + '。若与实测复核不一致，以实测复核为准。</p>' +
+      '<table><thead><tr><th>维度</th><th class="n">得分</th><th class="n">权重</th><th>说明</th></tr></thead><tbody>' + dimRows + '</tbody></table>' +
+
+      '<h2 class="pb">二、利润与现金流（' + esc(d.market.name) + '）</h2>' +
+      '<div class="kpi">' +
+      '<div><span>售价</span><b>' + yuan(p.inputs.price) + '</b></div>' +
+      '<div><span>到岸成本</span><b>' + yuan(p.landed) + '</b></div>' +
+      '<div><span>单件总成本</span><b>' + yuan(p.totalCost) + '</b></div>' +
+      '<div><span>资金周转</span><b>' + p.turnsPerYear.toFixed(1) + ' 次/年</b></div>' +
+      '<div><span>首批资金占用</span><b>' + yuan(p.cashTied) + '</b></div>' +
+      '<div><span>年化 ROI</span><b>' + (p.roi > 0 ? Math.round(p.roi) + '%' : '—') + '</b></div>' +
+      '</div>' +
+      '<table><thead><tr><th>成本项</th><th class="n">金额</th><th class="n">占售价</th><th>证据强度</th><th>数据来源</th></tr></thead><tbody>' +
+      costRows +
+      '<tr><td><b>合计</b></td><td class="n"><b>' + yuan(p.totalCost) + '</b></td><td class="n"><b>' + (p.totalCost / p.inputs.price * 100).toFixed(1) + '%</b></td><td colspan="2"></td></tr>' +
+      '</tbody></table>' +
+      '<p class="s">首批资金占用含可抵扣进口增值税 ' + yuan(p.vatRecoverable) + '；预计回本周期 ' +
+      (p.monthlyProfit > 0 ? (p.cashTied / p.monthlyProfit).toFixed(1) + ' 个月' : '无法回本') +
+      '；25% 目标毛利所需售价 ' + (isFinite(p.priceForTarget) ? yuan(Math.ceil(p.priceForTarget)) : '—') +
+      '；可承受最高采购价 ' + (isFinite(p.purchaseMax) ? yuan(p.purchaseMax) : '—') + '。</p>' +
+
+      '<h2 class="pb">三、合规与认证矩阵</h2>' +
+      '<table><thead><tr><th>认证 / 法规</th><th>性质</th><th>周期</th><th class="n">预估成本</th><th>合规义务</th></tr></thead><tbody>' +
+      certRows + '</tbody></table>' +
+      '<p class="s">周期与成本为行业均值估算，须以认证机构实际报价与官方公告为准。</p>' +
+
+      '<h2>四、知识产权与风险清单</h2>' +
+      '<p style="font-size:9pt">近似风险评分 <b>' + d.ip.score + '</b>（' + esc(d.ip.density) + '密度品类）· ' + esc(d.ip.conclusion) +
+      '<br><span class="s">' + esc(d.ip.note) + ' —— 初筛不替代代理机构正式 FTO 检索。</span></p>' +
+      '<table><thead><tr><th>风险项</th><th>等级</th><th>说明</th><th>来源</th></tr></thead><tbody>' + riskRows + '</tbody></table>' +
+
+      intelBlock +
+      ledgerBlock +
+
+      '<h2 class="pb">' + (intelBlock || ledgerBlock ? '七' : '五') + '、数据来源与证据强度</h2>' +
+      '<table><thead><tr><th>导入模板</th><th class="n">映射字段</th><th class="n">数据行</th><th>字段</th><th>导入时间</th></tr></thead><tbody>' +
+      dataRows + '</tbody></table>' +
+      '<p class="s">' + EV_LEGEND + '</p>' +
+
+      '<div class="disc"><b>免责声明</b><br>' + DISCLAIMER + '</div>' +
+      '<div class="foot">选品智能体 · 跨境电商选品专业版 · 本报告由本地浏览器离线生成，数据未上传云端 · ' + fmtTime(d.generatedAt) + '</div>' +
+      '</body></html>';
+  }
+
+  function printReport(d) {
+    var html = printHtml(d);
+    var w = window.open('', '_blank');
+    if (!w) {
+      // 弹窗被拦截：降级为下载打印版 HTML，用户自行打开打印
+      downloadFile(safeName(d.product.name) + '-选品分析报告-打印版-' + fileStamp(d.generatedAt) + '.html',
+        html, 'text/html;charset=utf-8');
+      toast('浏览器拦截了打印窗口，已改为下载打印版 HTML，打开后按 Ctrl+P 打印');
+      return;
+    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    var done = false;
+    function doPrint() {
+      if (done) return;
+      done = true;
+      try { w.focus(); w.print(); } catch (e) { /* 用户可手动 Ctrl+P */ }
+    }
+    w.addEventListener('load', function () { setTimeout(doPrint, 250); });
+    setTimeout(doPrint, 1200); // 兜底：load 未及时触发也能弹出打印
+    toast('已生成打印版报告，请在打印对话框中选择「另存为 PDF」或直接打印');
+  }
+
+  /* ============================================================
+     3. 对外接口
+     ============================================================ */
+  window.ReportUI = {
+    exportExcel: exportExcel,
+    printReport: printReport
+  };
+})();
 </script>
 <script>/* inlined: ./assets/app.js */
 // assets/app.js — 选品智能体原型：Mock 数据与交互逻辑
@@ -5594,6 +6275,10 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     var p = PRODUCTS[state.index];
     if (act === 'export') {
       exportReport();
+    } else if (act === 'export-excel') {
+      if (window.ReportUI) window.ReportUI.exportExcel(window.XPApp.reportData());
+    } else if (act === 'print-report') {
+      if (window.ReportUI) window.ReportUI.printReport(window.XPApp.reportData());
     } else if (act === 'start-flow') {
       toast('已提交「' + p.name + '」进入选品流程，需先解决前置条件后再投产');
     } else if (act === 'save-ledger') {
@@ -5646,6 +6331,56 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         market: engState(p).market,
         price: priceOf(p),
         suggested: suggested(p)
+      };
+    },
+    // 报告导出（Excel 明细 / 打印友好版）的全量结构化数据包，由 assets/report.js 消费
+    reportData: function () {
+      var p = PRODUCTS[state.index];
+      var es = engState(p);
+      var r = state.engine.result || Engine.computeProfit(inputsFor(p));
+      var vc = verdictCheck(p);
+      var dims = dimsOf(p);
+      var comp = Engine.complianceFor(es.market, classOfProduct(p));
+      var ip = Engine.ipRisk(p, profileOf(p));
+      var intel = (window.IntelUI && window.IntelUI.snapshot) ? window.IntelUI.snapshot() : null;
+      return {
+        generatedAt: Date.now(),
+        product: {
+          name: p.name, category: p.category, summary: p.summary, overall: p.overall,
+          rec: p.rec,
+          risks: p.risks.map(function (x) {
+            return { title: x.title, level: x.level, levelLabel: RISK_LABEL[x.level] || x.level, desc: x.desc, src: x.src };
+          })
+        },
+        market: { key: r.market.key, name: r.market.name, cur: r.market.cur },
+        score: {
+          overall: vc.overall, label: vc.label, level: vc.level, margin: vc.margin,
+          levers: vc.levers, note: vc.note,
+          dims: DIMS.map(function (dim) {
+            var v = dims[dim.key];
+            return { label: dim.label, weight: dim.weight, score: v.score, note: v.note };
+          })
+        },
+        profit: {
+          inputs: r.inputs,
+          landed: r.landed, vatRecoverable: r.vatRecoverable, totalCost: r.totalCost,
+          profit: r.profit, margin: r.margin, breakevenAcos: r.breakevenAcos,
+          turnsPerYear: r.turnsPerYear, cashTied: r.cashTied, monthlyProfit: r.monthlyProfit,
+          roi: r.roi, cycleDays: r.cycleDays, fbaTier: r.fbaTier,
+          priceForTarget: r.priceForTarget, purchaseMax: r.purchaseMax,
+          items: r.items.map(function (it) {
+            return { name: it.name, amount: it.amount, e: it.e, evidenceLabel: Engine.ev(it.e).label, src: it.src };
+          })
+        },
+        compliance: comp.map(function (c) {
+          return { name: c.name, mand: c.mand, weeks: c.weeks, costLo: c.cost[0], costHi: c.cost[1], duty: c.duty };
+        }),
+        ip: ip,
+        imports: (es.imports || []).map(function (x) {
+          return { template: x.template, mapped: x.mapped, rows: x.rows, fields: x.fields, time: x.time };
+        }),
+        intel: intel,
+        ledger: window.Ledger ? window.Ledger.list() : []
       };
     }
   };
