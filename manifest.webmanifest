@@ -1,0 +1,20 @@
+{
+  "name": "选品智能体 · 跨境电商选品专业版",
+  "short_name": "选品智能体",
+  "description": "跨境电商选品：机会评分 / 竞争分析 / 利润测算 / 合规与风险 / 决策台账。本地优先，可选择性开启云同步。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#f1f5f9",
+  "theme_color": "#1e293b",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
