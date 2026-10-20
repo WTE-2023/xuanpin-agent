@@ -789,6 +789,48 @@
     .ep-grid { grid-template-columns: 1fr; }
     .ip-grid { grid-template-columns: 1fr; }
   }
+  /* ---- 竞品与关键词情报 ---- */
+  .intel-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  .intel-card { border: 1px solid var(--rule); border-radius: 10px; padding: 12px 13px; background: var(--surface-2); }
+  .intel-card.has { background: var(--surface); }
+  .intel-card-h { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+  .intel-card-h b { font-size: 13px; }
+  .intel-card-h span { font-size: 11px; color: var(--muted); }
+  .intel-card-stat { display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: var(--ink-2); min-height: 22px; margin-bottom: 8px; }
+  .intel-card-stat.empty { color: var(--muted); }
+  .intel-card-act { display: flex; align-items: center; gap: 10px; }
+  .intel-empty { border: 1px dashed var(--rule); border-radius: 10px; padding: 18px; font-size: 12.5px; color: var(--ink-2); line-height: 1.7; }
+  .intel-empty p { margin: 6px 0 0; color: var(--muted); }
+  .intel-import { border: 1px solid var(--rule); border-radius: 10px; padding: 14px; margin-bottom: 14px; background: var(--surface-2); }
+  .intel-import h4 { margin: 0 0 4px; font-size: 13.5px; }
+  .intel-block { margin-top: 18px; }
+  .intel-sub { font-weight: 400; font-size: 11.5px; color: var(--muted); margin-left: 10px; }
+  .intel-sub2 { font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+  .intel-metrics { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .intel-metrics .im { border: 1px solid var(--rule); border-radius: 9px; padding: 8px 12px; min-width: 96px; background: var(--surface); }
+  .intel-metrics .im span { display: block; font-size: 10.5px; color: var(--muted); }
+  .intel-metrics .im b { font-size: 15px; }
+  .intel-metrics .im.hot b { color: var(--accent); }
+  .intel-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; align-items: start; }
+  .intel-chart { height: 230px; }
+  .intel-tbl th, .intel-tbl td { font-size: 12px; }
+  .intel-bar { height: 8px; border-radius: 5px; background: var(--rule-soft); overflow: hidden; min-width: 70px; }
+  .intel-bar span { display: block; height: 100%; background: var(--accent); border-radius: 5px; }
+  .intel-bar.kw span { background: #16a34a; }
+  .intel-bar.pain span { background: #dc2626; }
+  .intel-conclusion { font-size: 12.5px; line-height: 1.75; color: var(--ink-2); background: var(--surface-2); border-radius: 9px; padding: 10px 13px; margin: 12px 0 0; }
+  .intel-pain { margin-bottom: 12px; max-width: 640px; }
+  .ip-line { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .ip-label { font-weight: 600; }
+  .ip-count { color: var(--muted); }
+  .ip-samples { margin-top: 5px; display: flex; flex-direction: column; gap: 3px; }
+  .ip-samples span { font-size: 11px; color: var(--muted); }
+  .intel-write-state { font-size: 11.5px; color: var(--muted); align-self: center; }
+  .lg-intel { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 5px; background: var(--accent); color: #fff; font-size: 10px; line-height: 16px; cursor: help; vertical-align: 1px; }
+  @media (max-width: 1100px) {
+    .intel-cards { grid-template-columns: 1fr; }
+    .intel-grid { grid-template-columns: 1fr; }
+  }
   @media print {
     .sidebar, .topbar-actions, .sidebar-overlay, .toast, .overlay { display: none !important; }
     body { background: #fff; }
@@ -822,6 +864,10 @@
       <button class="nav-item" type="button" data-target="sec-competition">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>
         <span>竞争分析</span>
+      </button>
+      <button class="nav-item" type="button" data-target="sec-intel">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path><path d="M8 11h6M11 8v6"></path></svg>
+        <span>竞品情报</span>
       </button>
       <button class="nav-item" type="button" data-target="sec-profit">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M15 9.5a3 3 0 0 0-3-1.5c-1.7 0-3 1-3 2s1.3 2 3 2 3 1 3 2-1.3 2-3 2a3 3 0 0 1-3-1.5M12 6.5v11"></path></svg>
@@ -977,10 +1023,59 @@
         </p>
       </section>
 
-      <!-- 03 利润测算 -->
-      <section class="module" id="sec-profit" aria-labelledby="h-profit">
+      <!-- 03 竞品与关键词情报 -->
+      <section class="module" id="sec-intel" aria-labelledby="h-intel">
         <div class="module-head">
           <span class="idx">03</span>
+          <h2 id="h-intel">竞品与关键词情报</h2>
+          <p class="module-desc">导入 Keepa / 卖家精灵导出表（离线解析 · 不上传）：真实价格带 · 市场集中度 · 关键词机会 · Review 痛点聚类，结论可写入台账</p>
+        </div>
+
+        <div class="intel-cards" id="intelCards"></div>
+
+        <div class="intel-import" id="intelImport" style="display:none">
+          <h4 id="intelImpTitle">导入数据</h4>
+          <p class="form-tip" id="intelImpHint"></p>
+          <div class="imp-file">
+            <input type="file" id="intelImpFile" accept=".csv,.txt,.tsv">
+            <span>或直接把表格内容粘贴到下方文本框（CSV / TSV，需含表头）</span>
+          </div>
+          <textarea class="imp-textarea" id="intelImpText" placeholder="列名,列名,列名&#10;值,值,值"></textarea>
+          <div class="rec-actions" style="margin-top:10px">
+            <button class="btn btn-ghost" type="button" id="intelImpParse">解析并预览映射</button>
+          </div>
+          <div id="intelImpMap" style="display:none;margin-top:12px">
+            <div class="imp-sub">字段映射（可手动调整）</div>
+            <div class="imp-map">
+              <table>
+                <thead><tr><th>源列</th><th>示例值</th><th>映射到</th></tr></thead>
+                <tbody id="intelImpMapBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <p class="f-error" id="intelImpError" role="alert"></p>
+          <div class="rec-actions">
+            <button class="btn btn-primary" type="button" id="intelImpApply" disabled>应用并分析</button>
+            <button class="btn btn-ghost" type="button" id="intelImpCancel">取消</button>
+          </div>
+        </div>
+
+        <div id="intelResults"></div>
+
+        <div class="rec-actions" style="margin-top:14px">
+          <button class="btn btn-primary" type="button" id="intelWriteBtn" disabled>写入当前候选产品台账</button>
+          <span class="intel-write-state" id="intelWriteState"></span>
+        </div>
+
+        <p class="prd-note">
+          <b>口径与风险提示：</b>本模块全部数字来自你导入的第三方工具导出表（证据强度：用户导入），<b>其口径与采集时间由导出工具决定</b>：Keepa / 卖家精灵的销量为估算口径、价格为 Listing 标价而非实际成交价，可能与真实成交存在偏差；样本仅覆盖你导出的 Listing 范围，CR / HHI 会随样本范围变化，<b>不宜直接外推为全市场结论</b>。价格带图表中「我的定价」按 7.2 固定汇率折算为美元，仅用于同口径粗对齐。痛点聚类为<b>关键词规则匹配</b>（非语义理解），一条评论可归属多类，占比之和不等于 100%，结论需人工抽读原文复核。本模块输出不构成投资建议，不包含任何价格点位预测；「机会词」不代表转化保证，投放前请结合点击与转化数据验证。
+        </p>
+      </section>
+
+      <!-- 04 利润测算 -->
+      <section class="module" id="sec-profit" aria-labelledby="h-profit">
+        <div class="module-head">
+          <span class="idx">04</span>
           <h2 id="h-profit">利润测算与现金流</h2>
           <p class="module-desc">到岸成本 / FBA 配送 / 仓储 / 关税 / VAT / 广告 / 回款周期 → 单件利润、保本线与资金周转</p>
         </div>
@@ -1076,10 +1171,10 @@
         </p>
       </section>
 
-      <!-- 04 合规与认证矩阵 -->
+      <!-- 05 合规与认证矩阵 -->
       <section class="module" id="sec-compliance" aria-labelledby="h-compliance">
         <div class="module-head">
-          <span class="idx">04</span>
+          <span class="idx">05</span>
           <h2 id="h-compliance">合规与认证矩阵</h2>
           <p class="module-desc">目标市场 × 品类 → 强制认证清单、认证周期、预估成本与合规义务</p>
         </div>
@@ -1095,10 +1190,10 @@
         </p>
       </section>
 
-      <!-- 05 知识产权风险 -->
+      <!-- 06 知识产权风险 -->
       <section class="module" id="sec-ip" aria-labelledby="h-ip">
         <div class="module-head">
-          <span class="idx">05</span>
+          <span class="idx">06</span>
           <h2 id="h-ip">知识产权风险检索</h2>
           <p class="module-desc">商标 / 外观 / 专利近似检索入口 + 本地初筛评分 + 粘贴检索结果做 FTO 研判</p>
         </div>
@@ -1129,10 +1224,10 @@
         </p>
       </section>
 
-      <!-- 06 风险提示 -->
+      <!-- 07 风险提示 -->
       <section class="module" id="sec-risk" aria-labelledby="h-risk">
         <div class="module-head">
-          <span class="idx">06</span>
+          <span class="idx">07</span>
           <h2 id="h-risk">风险提示</h2>
           <p class="module-desc">按风险等级分级展示，帮助在决策前识别与规避潜在问题</p>
         </div>
@@ -1143,10 +1238,10 @@
         </p>
       </section>
 
-      <!-- 07 推荐结论 -->
+      <!-- 08 推荐结论 -->
       <section class="module" id="sec-recommend" aria-labelledby="h-rec">
         <div class="module-head">
-          <span class="idx">07</span>
+          <span class="idx">08</span>
           <h2 id="h-rec">推荐结论</h2>
           <p class="module-desc">综合机会评分、竞争分析、利润测算与风险评估生成可执行结论</p>
         </div>
@@ -1178,10 +1273,10 @@
         </p>
       </section>
 
-      <!-- 08 数据与证据 -->
+      <!-- 09 数据与证据 -->
       <section class="module" id="sec-data" aria-labelledby="h-data">
         <div class="module-head">
-          <span class="idx">08</span>
+          <span class="idx">09</span>
           <h2 id="h-data">数据来源与证据标注</h2>
           <p class="module-desc">全部数字的证据强度分级 + 已导入数据集清单 + 导入入口</p>
         </div>
@@ -1194,10 +1289,10 @@
         </p>
       </section>
 
-      <!-- 09 选品决策台账 -->
+      <!-- 10 选品决策台账 -->
       <section class="module" id="sec-ledger" aria-labelledby="h-ledger">
         <div class="module-head">
-          <span class="idx">09</span>
+          <span class="idx">10</span>
           <h2 id="h-ledger">选品决策台账</h2>
           <p class="module-desc">把每次测算冻结为可回溯的记录：参数快照留痕 · 决策状态 · 横向对比 · 本地持久化</p>
         </div>
@@ -3012,6 +3107,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
             '<div class="lg-name">' + esc(rec.name) + (rec.custom ? ' <span class="t-flag">自建</span>' : '') + '</div>' +
             '<div class="lg-sub">' + esc(rec.category || '') + ' · 版本 ' + ver +
             (ver > 1 ? ' <button class="lg-link" type="button" data-lg-hist="' + esc(rec.fp) + '">查看历史</button>' : '') +
+            intelChip(rec) +
             '</div>' +
           '</td>' +
           '<td>' + esc(valOf(rec, 'marketName')) + '</td>' +
@@ -3047,6 +3143,25 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     }).join('');
     var d = DEC_MAP[rec.decision] || DECISIONS[0];
     return '<select class="lg-dec ' + d.cls + '" data-lg-dec="' + esc(rec.fp) + '" aria-label="决策状态">' + opts + '</select>';
+  }
+
+  // 「竞品情报」模块写入的结论摘要：行内小标 + 悬停查看要点（标注类信息，不进参数快照）
+  function intelChip(rec) {
+    var it = rec.intel;
+    if (!it) return '';
+    var lines = ['竞品情报结论 · 写入于 ' + (it.time || '—')];
+    if (it.comp) {
+      lines.push('竞品 ' + it.comp.n + ' 行 · CR4 ' + it.comp.cr4 + '% · HHI ' + it.comp.hhi +
+        (it.comp.topBand ? ' · 主流价格带 ' + it.comp.topBand : ''));
+    }
+    if (it.kw && it.kw.top && it.kw.top.length) {
+      lines.push('机会词 ' + it.kw.top.map(function (x) { return x.kw + '(' + x.index + ')'; }).join(' / '));
+    }
+    if (it.rev && it.rev.pains && it.rev.pains.length) {
+      lines.push('痛点 TOP ' + it.rev.pains.map(function (x) { return x.label + ' ' + x.count + '条'; }).join('、'));
+    }
+    lines.push('数据来源：' + (it.sources || []).join(' + ') + '（用户导入强度，口径以导出工具为准）');
+    return ' <span class="lg-intel" title="' + esc(lines.join('\n')) + '">情报</span>';
   }
 
   // 版本留痕：列出该记录的每一次参数快照及其关键指标
@@ -3292,6 +3407,718 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     pct: pct,
     evBadge: evBadge
   };
+})();
+
+</script>
+<script>/* inlined: ./assets/intel.js */
+// assets/intel.js — 竞品与关键词情报：导入 Keepa / 卖家精灵导出表，输出真实市场情报
+// 分析维度：真实价格带分布 · 市场集中度（CR4 / CR8 / HHI）· 关键词机会 · Review 痛点聚类
+// 依赖：assets/engine.js（window.Engine：parseTable / 证据徽章）、assets/store.js（window.Ledger：结论写入台账）
+// 由 app.js 在 renderAll() 后调用 IntelUI.render()；当前产品上下文通过 window.XPApp.context() 获取。
+// 全部计算为确定性规则（分桶 / 份额 / 关键词词典匹配），不接付费 API、不写爬虫、不生成假数据。
+(function () {
+  'use strict';
+
+  /* ============================ 数据模板 ============================ */
+  var TEMPLATES = [
+    {
+      key: 'comp', name: '竞品列表', src: 'Keepa / 卖家精灵 竞品导出',
+      hint: '含 ASIN、Title、Brand、Price、Monthly Sold、Review Count、Rating 等列；价格与月销至少映射一列',
+      fields: [
+        { key: 'asin', label: 'ASIN / 编号', re: /^asin$|编号|货号/i },
+        { key: 'title', label: '标题', re: /title|标题|商品名|产品名|^name$/i },
+        { key: 'brand', label: '品牌 / 店铺', re: /brand|品牌|店铺|seller|商家/i },
+        { key: 'price', label: '价格', re: /price|售价|价格|定价|价$/i, num: true },
+        { key: 'monthlySales', label: '月销量', re: /month(ly)?\s*sold|月销|销量|sales|sold/i, num: true },
+        { key: 'reviewCount', label: '评论数', re: /review(s)?\s*count|评论数|评价数|ratings\s*count/i, num: true },
+        { key: 'rating', label: '评分', re: /^rating$|评分|星级|stars/i, num: true }
+      ]
+    },
+    {
+      key: 'kw', name: '关键词表', src: '卖家精灵 / Amazon 品牌分析 导出',
+      hint: '含 关键词、月搜索量、竞争商品数 等列；关键词与月搜索量为必填映射',
+      fields: [
+        { key: 'keyword', label: '关键词', re: /keyword|关键词|搜索词|term|query/i },
+        { key: 'searchVolume', label: '月搜索量', re: /search\s*volume|月搜索|搜索量|volume/i, num: true },
+        { key: 'competing', label: '竞争商品数', re: /competing|商品数|竞争|products|supply|results/i, num: true },
+        { key: 'cpc', label: 'CPC 竞价（可选）', re: /cpc|ppc|竞价|bid/i, num: true }
+      ]
+    },
+    {
+      key: 'rev', name: 'Review 明细', src: '评论导出工具 / 手工整理',
+      hint: '含 评论内容、星级（1-5）两列；痛点聚类只统计 ≤3 星的中差评',
+      fields: [
+        { key: 'content', label: '评论内容', re: /review|评论|内容|content|body|text|comment/i },
+        { key: 'rating', label: '星级', re: /rating|星级|评分|stars?/i, num: true }
+      ]
+    }
+  ];
+  var TPL_MAP = {};
+  TEMPLATES.forEach(function (t) { TPL_MAP[t.key] = t; });
+
+  /* ============================ 示例数据（供离线体验，非真实市场数据） ============================ */
+  var SAMPLES = {
+    comp: [
+      'ASIN,Title,Brand,List Price,Monthly Sold,Review Count,Rating',
+      'B0DEMO001A,Lumina Desk Lamp Pro 24W Eye-Care,Lumina,32.99,4200,8612,4.6',
+      'B0DEMO002B,BrightHome LED Desk Lamp with USB,BrightHome,24.49,6800,15230,4.5',
+      'B0DEMO003C,NordicGlow Touch Lamp Stepless Dim,NordicGlow,45.99,1500,2130,4.7',
+      'B0DEMO004D,Lumina Clip Reading Light Portable,Lumina,18.99,5300,9840,4.4',
+      'B0DEMO005E,FlexiArm Architect Lamp Metal,FlexiArm,38.50,2100,3470,4.5',
+      'B0DEMO006F,BrightHome Fold Lamp Battery 4000mAh,BrightHome,27.99,4600,7210,4.3',
+      'B0DEMO007G,AuroraLite Smart Lamp App Control,AuroraLite,52.00,980,1640,4.2',
+      'B0DEMO008H,CozyBeam Wood Base Table Lamp,CozyBeam,29.99,3100,4520,4.6',
+      'B0DEMO009J,Lumina Mini Night Light 2-Pack,Lumina,15.99,8900,21350,4.5',
+      'B0DEMO010K,FlexiArm Magnifier Lamp 5X,FlexiArm,42.75,760,1120,4.4',
+      'B0DEMO011M,PureDay Sunlight Lamp 10000 Lux,PureDay,59.99,640,2380,4.1',
+      'B0DEMO012N,CozyBeam Dimmable Bedside Lamp,CozyBeam,22.49,5400,11260,4.5'
+    ].join('\n'),
+    kw: [
+      'Keyword,Search Volume,Competing Products,CPC',
+      'desk lamp,165000,4200,1.85',
+      'led desk lamp,74000,2600,1.62',
+      'desk lamp with usb port,12100,640,1.35',
+      'eye caring desk lamp,9900,410,1.48',
+      'desk lamp for home office,33100,1900,1.71',
+      'clip on reading light,27100,2300,1.12',
+      'battery operated desk lamp,8100,520,0.98',
+      'desk lamp with wireless charger,5400,880,1.55',
+      'architect desk lamp,6600,730,1.29',
+      'small desk lamp for bedroom,14800,1600,1.21'
+    ].join('\n'),
+    rev: [
+      'Review,Rating',
+      '亮度不错但用了两周就开始闪烁，质量堪忧,2',
+      'The clamp broke after a month, poor build quality,1',
+      '说明书全是英文看不懂，安装半天没装好,3',
+      'Smells like burning plastic when on for hours,1',
+      '尺寸比想象小很多，桌面大一点就照不全,3',
+      'Battery drains way too fast, barely 2 hours,2',
+      '包装简陋，收到时灯罩已经压变形了,2',
+      'Shipping took 5 weeks, no tracking update,3',
+      '客服不回消息，退换货很麻烦,1',
+      '灯光很舒服，就是调光档位太少,4',
+      'Noise from the adapter is annoying at night,2',
+      '性价比可以，但线太短了,4',
+      'Touch switch stopped working after 2 weeks,1',
+      '颜值高亮度够，孩子会烫到手要小心,3',
+      'Great lamp for the price, use it daily,5',
+      '底座太轻易倒，猫一碰就摔了,2',
+      '很满意第二次购买,5'
+    ].join('\n')
+  };
+
+  /* ============================ 解析与映射 ============================ */
+  function suggestMapping(headers, tplKey) {
+    var tpl = TPL_MAP[tplKey] || TEMPLATES[0];
+    var map = {};
+    headers.forEach(function (h, idx) {
+      var found = '';
+      tpl.fields.forEach(function (f) { if (!found && f.re.test(h)) found = f.key; });
+      map[idx] = found;
+    });
+    return map;
+  }
+
+  function toNum(v) {
+    var n = parseFloat(String(v == null ? '' : v).replace(/[^\d.\-]/g, ''));
+    return isFinite(n) ? n : null;
+  }
+
+  // 应用映射 → 结构化行；返回 { rows, mapped, missing[] }
+  function applyRows(parsed, mapping, tplKey) {
+    var tpl = TPL_MAP[tplKey];
+    var rows = parsed.rows.map(function (r) {
+      var o = {};
+      parsed.headers.forEach(function (h, idx) {
+        var f = mapping[idx];
+        if (!f) return;
+        var field = tpl.fields.filter(function (x) { return x.key === f; })[0];
+        o[f] = field && field.num ? toNum(r[idx]) : String(r[idx] == null ? '' : r[idx]).trim();
+      });
+      return o;
+    });
+    var used = {};
+    Object.keys(mapping).forEach(function (idx) { if (mapping[idx]) used[mapping[idx]] = 1; });
+    return { rows: rows, mapped: Object.keys(used).length, used: used };
+  }
+
+  /* ============================ 分析：竞品（价格带 + 集中度） ============================ */
+  function median(arr) {
+    if (!arr.length) return null;
+    var a = arr.slice().sort(function (x, y) { return x - y; });
+    var m = a.length >> 1;
+    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+  }
+
+  // 把 [min,max] 划分为至多 8 个「好看」的桶
+  function niceBands(min, max, count) {
+    if (!(max > min)) return [{ lo: min, hi: max, count: 0, sales: 0 }];
+    var raw = (max - min) / (count || 8);
+    var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    // 向上取「好看」步长（1/2/5/10 × mag），保证桶数不超过目标
+    var step = raw / mag >= 5 ? mag * 10 : raw / mag >= 2 ? mag * 5 : mag * 2;
+    var start = Math.floor(min / step) * step;
+    var bands = [];
+    for (var lo = start; lo < max; lo += step) {
+      bands.push({ lo: lo, hi: lo + step, count: 0, sales: 0 });
+    }
+    return bands;
+  }
+
+  function compAnalysis(rows) {
+    var priced = rows.filter(function (r) { return r.price > 0; });
+    var saled = rows.filter(function (r) { return r.monthlySales > 0; });
+    var totalSales = saled.reduce(function (s, r) { return s + r.monthlySales; }, 0);
+
+    // 价格带：桶内按「Listing 数」与「销量份额」双口径统计
+    var prices = priced.map(function (r) { return r.price; });
+    var bands = prices.length ? niceBands(Math.min.apply(null, prices), Math.max.apply(null, prices), 8) : [];
+    priced.forEach(function (r) {
+      for (var i = 0; i < bands.length; i++) {
+        if (r.price >= bands[i].lo && (r.price < bands[i].hi || i === bands.length - 1)) {
+          bands[i].count++;
+          bands[i].sales += r.monthlySales || 0;
+          break;
+        }
+      }
+    });
+    var topBand = bands.slice().sort(function (a, b) { return b.sales - a.sales; })[0] || null;
+
+    // 市场集中度：按品牌聚合销量 → CR4 / CR8 / HHI
+    var byBrand = {};
+    saled.forEach(function (r) {
+      var b = r.brand || '（未标注品牌）';
+      byBrand[b] = (byBrand[b] || 0) + r.monthlySales;
+    });
+    var brands = Object.keys(byBrand).map(function (b) {
+      return { brand: b, sales: byBrand[b], share: totalSales ? byBrand[b] / totalSales * 100 : 0 };
+    }).sort(function (a, b) { return b.sales - a.sales; });
+    function cr(n) { return brands.slice(0, n).reduce(function (s, x) { return s + x.share; }, 0); }
+    var hhi = brands.reduce(function (s, x) { return s + x.share * x.share; }, 0);
+
+    var ratings = rows.filter(function (r) { return r.rating > 0; });
+    return {
+      n: rows.length,
+      pricedN: priced.length,
+      saledN: saled.length,
+      totalSales: totalSales,
+      medianPrice: median(prices),
+      avgRating: ratings.length ? ratings.reduce(function (s, r) { return s + r.rating; }, 0) / ratings.length : null,
+      bands: bands,
+      topBand: topBand,
+      brands: brands.slice(0, 8),
+      brandN: brands.length,
+      cr4: cr(4), cr8: cr(8), hhi: hhi,
+      leaders: saled.slice().sort(function (a, b) { return b.monthlySales - a.monthlySales; }).slice(0, 8)
+    };
+  }
+
+  /* ============================ 分析：关键词机会 ============================ */
+  function kwAnalysis(rows) {
+    var valid = rows.filter(function (r) { return r.keyword && r.searchVolume > 0; });
+    var opps = valid.map(function (r) {
+      // 机会分 = 月搜索量 ÷ (竞争商品数 + 1)：需求高且供给少的词得分高
+      var raw = r.competing != null ? r.searchVolume / (r.competing + 1) : r.searchVolume;
+      return { keyword: r.keyword, sv: r.searchVolume, competing: r.competing, cpc: r.cpc, raw: raw };
+    }).sort(function (a, b) { return b.raw - a.raw; });
+    var maxRaw = opps.length ? opps[0].raw : 1;
+    opps.forEach(function (o) {
+      o.index = Math.round(o.raw / maxRaw * 100);
+      o.grade = o.index >= 40 ? '机会词' : o.index >= 12 ? '关注' : '红海';
+    });
+    return { n: rows.length, validN: valid.length, list: opps.slice(0, 15), total: opps.length };
+  }
+
+  /* ============================ 分析：Review 痛点聚类 ============================ */
+  // 规则词典：每类痛点一组中英文关键词，评论文本命中即归入该类（可多归）
+  var PAIN_DICT = [
+    { key: 'quality', label: '质量 / 耐用性', words: ['质量', '坏了', '耐用', 'broke', 'broken', 'defect', 'stopped working', 'poor build', '闪烁', 'flicker'] },
+    { key: 'size', label: '尺寸 / 规格', words: ['尺寸', '太大', '太小', 'size', 'too small', 'too big', 'short', '太短'] },
+    { key: 'battery', label: '电池 / 续航', words: ['电池', '续航', 'battery', 'charge', 'drain', '充电'] },
+    { key: 'smell', label: '异味 / 材料', words: ['异味', '味道', 'smell', 'odor', 'plastic', '塑料'] },
+    { key: 'pack', label: '包装破损', words: ['包装', '破损', '变形', 'package', 'packaging', 'damaged', 'dented'] },
+    { key: 'ship', label: '物流时效', words: ['物流', '发货', 'shipping', 'delivery', 'tracking', '快递'] },
+    { key: 'manual', label: '说明书 / 安装', words: ['说明书', '安装', 'instruction', 'manual', 'setup', 'assemble'] },
+    { key: 'service', label: '售后 / 客服', words: ['售后', '客服', '退', 'refund', 'return', 'customer service', 'warranty', '换货'] },
+    { key: 'noise', label: '噪音', words: ['噪音', '吵', 'noise', 'noisy', 'buzz', 'hum'] },
+    { key: 'safe', label: '安全隐患', words: ['安全', '烫', 'burning', 'hot', 'fire', 'overheat', '隐患', '过热'] },
+    { key: 'func', label: '功能缺陷', words: ['功能', '档位', '开关', 'switch', 'button', 'feature', 'app', '遥控', 'timer'] },
+    { key: 'stable', label: '结构 / 稳定性', words: ['底座', '不稳', '倒', 'stable', 'wobble', 'tip over', 'clamp', '夹'] }
+  ];
+
+  function revAnalysis(rows) {
+    var rated = rows.filter(function (r) { return r.content; });
+    var low = rated.filter(function (r) { return r.rating != null && r.rating <= 3; });
+    var clusters = PAIN_DICT.map(function (c) {
+      var count = 0, samples = [];
+      low.forEach(function (r) {
+        var text = String(r.content).toLowerCase();
+        var hit = c.words.some(function (w) { return text.indexOf(w.toLowerCase()) >= 0; });
+        if (!hit) return;
+        count++;
+        if (samples.length < 2) samples.push(String(r.content).slice(0, 90));
+      });
+      return { key: c.key, label: c.label, count: count, samples: samples };
+    }).filter(function (c) { return c.count > 0; })
+      .sort(function (a, b) { return b.count - a.count; });
+    var maxCount = clusters.length ? clusters[0].count : 1;
+    clusters.forEach(function (c) { c.pct = low.length ? c.count / low.length * 100 : 0; c.w = Math.round(c.count / maxCount * 100); });
+    return {
+      n: rows.length,
+      lowN: low.length,
+      lowRate: rated.length ? low.length / rated.length * 100 : 0,
+      clusters: clusters
+    };
+  }
+
+  /* ============================ 台账摘要（仅取「用户导入」来源的数据集） ============================ */
+  function buildSummary(datasets) {
+    var out = { time: nowStamp(), sources: [] };
+    if (datasets.comp && datasets.comp.source === 'imp') {
+      var a = compAnalysis(datasets.comp.rows);
+      out.comp = {
+        n: a.n, cr4: round1(a.cr4), cr8: round1(a.cr8), hhi: Math.round(a.hhi),
+        medianPrice: a.medianPrice != null ? round1(a.medianPrice) : null,
+        topBand: a.topBand ? bandLabel(a.topBand) : null
+      };
+      out.sources.push('竞品列表 ' + a.n + ' 行');
+    }
+    if (datasets.kw && datasets.kw.source === 'imp') {
+      var k = kwAnalysis(datasets.kw.rows);
+      out.kw = { n: k.validN, top: k.list.slice(0, 3).map(function (o) { return { kw: o.keyword, index: o.index }; }) };
+      out.sources.push('关键词 ' + k.validN + ' 行');
+    }
+    if (datasets.rev && datasets.rev.source === 'imp') {
+      var v = revAnalysis(datasets.rev.rows);
+      out.rev = {
+        n: v.n, lowRate: round1(v.lowRate),
+        pains: v.clusters.slice(0, 3).map(function (c) { return { label: c.label, count: c.count }; })
+      };
+      out.sources.push('Review ' + v.n + ' 行');
+    }
+    return out.sources.length ? out : null;
+  }
+
+  function round1(n) { return Math.round(n * 10) / 10; }
+  function bandLabel(b) { return fmtPrice(b.lo) + ' – ' + fmtPrice(b.hi); }
+  function fmtPrice(n) { return '$' + (Math.round(n * 100) / 100); }
+  function nowStamp() {
+    var d = new Date();
+    function p(n) { return String(n).padStart(2, '0'); }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  window.Intel = {
+    TEMPLATES: TEMPLATES, SAMPLES: SAMPLES, PAIN_DICT: PAIN_DICT,
+    suggestMapping: suggestMapping, applyRows: applyRows,
+    compAnalysis: compAnalysis, kwAnalysis: kwAnalysis, revAnalysis: revAnalysis,
+    buildSummary: buildSummary
+  };
+
+  /* ============================================================
+     以下为界面层（IntelUI）：数据卡 → 导入面板 → 分析结果 → 写入台账
+     ============================================================ */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function evBadge(k, label) {
+    var e = window.Engine.ev(k);
+    return '<span class="ev-badge ev-' + e.key + '" title="' + esc(e.desc) + '">' + esc(label || e.short) + '</span>';
+  }
+  function sampleBadge() {
+    return '<span class="ev-badge ev-est" title="内置示例数据，仅用于体验交互流程，不代表真实市场">示例</span>';
+  }
+  function toast(msg) {
+    var el = $('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.classList.remove('show'); }, 2400);
+  }
+
+  // 每个「产品 + 市场」各自持有情报数据集（竞品数据本身分市场）
+  var STATE = {};
+  function ctx() {
+    return window.XPApp && window.XPApp.context ? window.XPApp.context() : null;
+  }
+  function stateKey(c) {
+    return window.Ledger.fingerprint({ name: c.name, profileKey: c.profileKey, market: c.market });
+  }
+  function ds() {
+    var c = ctx();
+    if (!c) return null;
+    var k = stateKey(c);
+    if (!STATE[k]) STATE[k] = { comp: null, kw: null, rev: null };
+    return STATE[k];
+  }
+
+  var UI = { activeTpl: 'comp', parsed: null, mapping: {}, chart: null };
+
+  /* ---------------------- 渲染：数据集卡片 ---------------------- */
+  function renderCards(st) {
+    $('intelCards').innerHTML = TEMPLATES.map(function (t) {
+      var d = st[t.key];
+      var stat = d
+        ? '<div class="intel-card-stat">' + (d.source === 'imp' ? evBadge('imp') : sampleBadge()) +
+          '<span><b>' + d.rows.length + '</b> 行</span><span>' + esc(d.time) + '</span></div>'
+        : '<div class="intel-card-stat empty">未导入</div>';
+      return '<div class="intel-card' + (d ? ' has' : '') + '">' +
+        '<div class="intel-card-h"><b>' + esc(t.name) + '</b><span>' + esc(t.src) + '</span></div>' +
+        stat +
+        '<div class="intel-card-act">' +
+          '<button class="lg-btn" type="button" data-intel-open="' + t.key + '">' + (d ? '重新导入' : '导入数据') + '</button>' +
+          '<button class="lg-link" type="button" data-intel-sample="' + t.key + '">载入示例</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  /* ---------------------- 渲染：导入面板 ---------------------- */
+  function openPanel(tplKey, presetText) {
+    UI.activeTpl = tplKey;
+    UI.parsed = null;
+    UI.mapping = {};
+    var t = TPL_MAP[tplKey];
+    $('intelImpTitle').textContent = '导入「' + t.name + '」 — ' + t.src;
+    $('intelImpHint').textContent = t.hint;
+    $('intelImpText').value = presetText || '';
+    $('intelImpFile').value = '';
+    $('intelImpError').classList.remove('show');
+    $('intelImpMap').style.display = 'none';
+    $('intelImport').style.display = '';
+    if (presetText) parseImport();
+    else $('intelImpText').focus();
+  }
+
+  function parseImport() {
+    var text = $('intelImpText').value;
+    if (!text.trim()) { showErr('请先粘贴表格内容，或选择 CSV / TSV 文件'); return; }
+    var parsed = window.Engine.parseTable(text);
+    if (!parsed.headers.length || !parsed.rows.length) {
+      showErr('未识别到有效表头与数据行，请确认首行为列名、且每行字段数一致');
+      return;
+    }
+    $('intelImpError').classList.remove('show');
+    UI.parsed = parsed;
+    UI.mapping = suggestMapping(parsed.headers, UI.activeTpl);
+    renderMapping();
+  }
+  function showErr(msg) { var el = $('intelImpError'); el.textContent = msg; el.classList.add('show'); }
+
+  function renderMapping() {
+    var t = TPL_MAP[UI.activeTpl];
+    var parsed = UI.parsed;
+    $('intelImpMapBody').innerHTML = parsed.headers.map(function (h, idx) {
+      var sample = parsed.rows.slice(0, 2).map(function (r) { return r[idx]; }).filter(Boolean).join(' / ');
+      var opts = t.fields.map(function (f) {
+        return '<option value="' + f.key + '"' + (UI.mapping[idx] === f.key ? ' selected' : '') + '>' + f.label + '</option>';
+      }).join('') + '<option value=""' + (!UI.mapping[idx] ? ' selected' : '') + '>（不导入）</option>';
+      return '<tr><td>' + esc(h) + '</td><td class="imp-sample">' + esc(sample || '—') + '</td>' +
+        '<td><select data-intel-col="' + idx + '">' + opts + '</select></td></tr>';
+    }).join('');
+    $('intelImpMap').style.display = '';
+    updateApplyState();
+  }
+
+  function updateApplyState() {
+    var btn = $('intelImpApply');
+    if (!UI.parsed) { btn.disabled = true; return; }
+    var chk = validate();
+    btn.disabled = !chk.ok;
+    btn.textContent = chk.ok ? '应用并分析（' + chk.rows + ' 行）' : chk.reason;
+  }
+
+  function validate() {
+    var res = applyRows(UI.parsed, UI.mapping, UI.activeTpl);
+    var u = res.used;
+    if (UI.activeTpl === 'comp') {
+      if (!u.price && !u.monthlySales) return { ok: false, reason: '请至少映射「价格」或「月销量」一列' };
+      var usable = res.rows.filter(function (r) { return r.price > 0 || r.monthlySales > 0; });
+      if (!usable.length) return { ok: false, reason: '映射列中没有可用的数值行' };
+      return { ok: true, rows: usable.length, result: res };
+    }
+    if (UI.activeTpl === 'kw') {
+      if (!u.keyword || !u.searchVolume) return { ok: false, reason: '请映射「关键词」与「月搜索量」两列' };
+      var kw = res.rows.filter(function (r) { return r.keyword && r.searchVolume > 0; });
+      if (!kw.length) return { ok: false, reason: '映射列中没有可用的关键词行' };
+      return { ok: true, rows: kw.length, result: res };
+    }
+    if (!u.content) return { ok: false, reason: '请映射「评论内容」列' };
+    var rev = res.rows.filter(function (r) { return r.content; });
+    if (!rev.length) return { ok: false, reason: '映射列中没有可用的评论行' };
+    return { ok: true, rows: rev.length, result: res };
+  }
+
+  function applyImport(source) {
+    var chk = validate();
+    if (!chk.ok) { showErr(chk.reason); return; }
+    var t = TPL_MAP[UI.activeTpl];
+    var st = ds();
+    if (!st) return;
+    st[UI.activeTpl] = { rows: chk.result.rows, time: nowStamp(), source: source || 'imp', template: t.name };
+    $('intelImport').style.display = 'none';
+    render();
+    toast('已导入「' + t.name + '」' + chk.rows + ' 行 · 分析结果已更新（证据强度：' + (source === 'sample' ? '示例' : '用户导入') + '）');
+  }
+
+  /* ---------------------- 渲染：分析结果 ---------------------- */
+  function render() {
+    var host = $('intelResults');
+    if (!host) return;
+    var st = ds();
+    var c = ctx();
+    if (!st || !c) return;
+
+    renderCards(st);
+
+    var any = st.comp || st.kw || st.rev;
+    if (!any) {
+      host.innerHTML =
+        '<div class="intel-empty"><b>还没有情报数据</b>' +
+        '<p>从上方卡片导入 Keepa / 卖家精灵的竞品列表、关键词表或 Review 明细（离线解析，不上传）。' +
+        '导入后即可得到真实价格带、市场集中度、关键词机会与痛点聚类；没有现成导出表时，可点「载入示例」先体验完整流程。</p></div>';
+      updateWriteBtn(st);
+      disposeChart();
+      return;
+    }
+
+    var html = '';
+    if (st.comp) html += renderComp(st.comp, c);
+    if (st.kw) html += renderKw(st.kw);
+    if (st.rev) html += renderRev(st.rev);
+    host.innerHTML = html;
+
+    if (st.comp) drawBands(st.comp, c);
+    else disposeChart();
+    updateWriteBtn(st);
+  }
+
+  function srcBadge(d) { return d.source === 'imp' ? evBadge('imp') : sampleBadge(); }
+
+  function renderComp(d, c) {
+    var a = compAnalysis(d.rows);
+    var hhiLv = a.hhi > 2500 ? ['高集中', '头部垄断明显，新进入者需显著差异化或细分场景切入']
+      : a.hhi > 1500 ? ['中集中', '头部有优势但腰部仍有空间，可瞄准价格带空档切入']
+      : ['低集中', '格局分散，新进入者有机会凭产品力与评价积累拿份额'];
+
+    var metrics =
+      '<div class="intel-metrics">' +
+        '<div class="im"><span>样本 Listing</span><b>' + a.n + '</b></div>' +
+        '<div class="im"><span>月销量合计</span><b>' + a.totalSales.toLocaleString('en-US') + '</b></div>' +
+        '<div class="im"><span>价格中位数</span><b>' + (a.medianPrice != null ? fmtPrice(a.medianPrice) : '—') + '</b></div>' +
+        '<div class="im"><span>平均评分</span><b>' + (a.avgRating != null ? a.avgRating.toFixed(2) : '—') + '</b></div>' +
+        '<div class="im hot"><span>CR4</span><b>' + round1(a.cr4) + '%</b></div>' +
+        '<div class="im hot"><span>CR8</span><b>' + round1(a.cr8) + '%</b></div>' +
+        '<div class="im hot"><span>HHI</span><b>' + Math.round(a.hhi) + '</b></div>' +
+      '</div>';
+
+    var bandNote = a.topBand
+      ? '<p class="intel-conclusion">销量最集中的主流价格带为 <b>' + bandLabel(a.topBand) + '</b>' +
+        '（该带内 ' + a.topBand.count + ' 个 Listing、月销量 ' + a.topBand.sales.toLocaleString('en-US') + ' 件）。' +
+        (c.price ? '当前候选产品定价约 <b>$' + esc((c.price / 7.2).toFixed(2)) + '</b>（按 7.2 汇率折算），' : '') +
+        '集中度 ' + hhiLv[0] + '（HHI ' + Math.round(a.hhi) + '）：' + hhiLv[1] + '。</p>'
+      : '<p class="intel-conclusion">映射的「价格」列暂无可用数值，无法计算价格带。</p>';
+
+    var brandRows = a.brands.map(function (b) {
+      return '<tr><td>' + esc(b.brand) + '</td><td class="num">' + b.sales.toLocaleString('en-US') + '</td>' +
+        '<td class="num">' + b.share.toFixed(1) + '%</td>' +
+        '<td><div class="intel-bar"><span style="width:' + Math.max(2, Math.round(b.share)) + '%"></span></div></td></tr>';
+    }).join('');
+
+    return '<div class="intel-block">' +
+      '<h3 class="sub-head">真实价格带与市场集中度 ' + srcBadge(d) +
+        '<span class="intel-sub">竞品列表 ' + a.n + ' 行 · ' + esc(d.time) + '</span></h3>' +
+      metrics +
+      '<div class="intel-grid">' +
+        '<div><div class="intel-sub2">价格带分布（柱 = Listing 数，标签 = 带内月销量）</div><div class="intel-chart" id="intelBandChart"></div></div>' +
+        '<div><div class="intel-sub2">品牌销量份额（Top ' + a.brands.length + ' / 共 ' + a.brandN + ' 个品牌）</div>' +
+          '<div class="table-wrap"><table class="comp-table intel-tbl"><thead><tr><th>品牌</th><th class="num">月销量</th><th class="num">份额</th><th>占比</th></tr></thead>' +
+          '<tbody>' + brandRows + '</tbody></table></div></div>' +
+      '</div>' + bandNote + '</div>';
+  }
+
+  function renderKw(d) {
+    var k = kwAnalysis(d.rows);
+    var rows = k.list.map(function (o) {
+      var pill = o.grade === '机会词' ? 'pill-strong' : o.grade === '关注' ? 'pill-mid' : 'pill-weak';
+      return '<tr><td>' + esc(o.keyword) + '</td>' +
+        '<td class="num">' + o.sv.toLocaleString('en-US') + '</td>' +
+        '<td class="num">' + (o.competing != null ? o.competing.toLocaleString('en-US') : '—') + '</td>' +
+        '<td class="num">' + (o.cpc != null ? '$' + o.cpc.toFixed(2) : '—') + '</td>' +
+        '<td><div class="intel-bar kw"><span style="width:' + Math.max(2, o.index) + '%"></span></div></td>' +
+        '<td class="num">' + o.index + '</td>' +
+        '<td><span class="pill ' + pill + '">' + o.grade + '</span></td></tr>';
+    }).join('');
+    var top = k.list[0];
+    return '<div class="intel-block">' +
+      '<h3 class="sub-head">关键词机会 ' + srcBadge(d) +
+        '<span class="intel-sub">有效关键词 ' + k.validN + ' 个 · 机会分 = 月搜索量 ÷（竞争商品数 + 1），归一化到 0-100</span></h3>' +
+      '<div class="table-wrap"><table class="comp-table intel-tbl"><thead><tr>' +
+        '<th>关键词</th><th class="num">月搜索量</th><th class="num">竞争商品数</th><th class="num">CPC</th><th>机会分</th><th class="num">分值</th><th>分级</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      (top ? '<p class="intel-conclusion">机会最高的词为 <b>' + esc(top.keyword) + '</b>（机会分 ' + top.index +
+        '）：搜索需求可观且在售商品相对少，适合埋入标题 / 五点描述并优先投放。' +
+        '「机会词」仅代表供需比相对占优，<b>不等于转化保证</b>，需结合点击与转化数据复核。</p>' : '') +
+      '</div>';
+  }
+
+  function renderRev(d) {
+    var v = revAnalysis(d.rows);
+    var bars = v.clusters.map(function (cl) {
+      return '<div class="intel-pain">' +
+        '<div class="ip-line"><span class="ip-label">' + esc(cl.label) + '</span>' +
+        '<span class="ip-count">' + cl.count + ' 条 · ' + cl.pct.toFixed(0) + '%</span></div>' +
+        '<div class="intel-bar pain"><span style="width:' + Math.max(3, cl.w) + '%"></span></div>' +
+        (cl.samples.length ? '<div class="ip-samples">' + cl.samples.map(function (s) { return '<span>“' + esc(s) + '”</span>'; }).join('') + '</div>' : '') +
+        '</div>';
+    }).join('');
+    var top = v.clusters[0];
+    return '<div class="intel-block">' +
+      '<h3 class="sub-head">Review 痛点聚类 ' + srcBadge(d) +
+        '<span class="intel-sub">评论 ' + v.n + ' 条 · 中差评（≤3 星）' + v.lowN + ' 条（' + v.lowRate.toFixed(1) + '%）· 关键词规则匹配，一条评论可归属多类</span></h3>' +
+      (v.lowN ? bars : '<p class="intel-conclusion">当前数据中没有 ≤3 星的评论，无法聚类痛点；请确认「星级」列映射正确。</p>') +
+      (top ? '<p class="intel-conclusion">中差评中最集中的痛点是 <b>' + esc(top.label) + '</b>（' + top.count + ' 条）。' +
+        '把该痛点转化为产品卖点与 A+ 页面承诺，是差异化切入的最短路径；其余高频痛点可作为质检与详情页 FAQ 清单。</p>' : '') +
+      '</div>';
+  }
+
+  /* ---------------------- 价格带图表 ---------------------- */
+  function drawBands(d, c) {
+    var el = $('intelBandChart');
+    if (!el || typeof echarts === 'undefined') return;
+    disposeChart();
+    var a = compAnalysis(d.rows);
+    if (!a.bands.length) return;
+    var myPrice = c.price ? c.price / 7.2 : null; // 人民币定价按 7.2 折算美元，与导出表同口径对比
+    UI.chart = echarts.init(el, null, { renderer: 'svg' });
+    UI.chart.setOption({
+      animation: false,
+      grid: { left: 40, right: 12, top: 26, bottom: 44 },
+      tooltip: {
+        trigger: 'axis', appendToBody: true, backgroundColor: '#0f172a', borderWidth: 0,
+        textStyle: { color: '#fff', fontSize: 12 },
+        formatter: function (ps) {
+          var b = a.bands[ps[0].dataIndex];
+          return bandLabel(b) + '<br>Listing ' + b.count + ' 个 · 月销量 ' + b.sales.toLocaleString('en-US') + ' 件';
+        }
+      },
+      xAxis: {
+        type: 'category',
+        data: a.bands.map(function (b) { return bandLabel(b); }),
+        axisLabel: { fontSize: 10, rotate: 30, color: '#64748b' },
+        axisLine: { lineStyle: { color: '#cbd5e1' } }
+      },
+      yAxis: {
+        type: 'value', name: 'Listing 数', nameTextStyle: { fontSize: 10, color: '#64748b' },
+        axisLabel: { fontSize: 10, color: '#64748b' },
+        splitLine: { lineStyle: { color: '#e2e8f0' } }
+      },
+      series: [{
+        type: 'bar', barMaxWidth: 42,
+        data: a.bands.map(function (b) {
+          var isTop = a.topBand && b === a.topBand;
+          var mine = myPrice != null && myPrice >= b.lo && myPrice < b.hi;
+          return {
+            value: b.count,
+            itemStyle: { color: mine ? '#2563eb' : isTop ? '#16a34a' : '#94a3b8', borderRadius: [4, 4, 0, 0] },
+            label: { show: b.sales > 0, position: 'top', fontSize: 9, color: '#64748b', formatter: b.sales >= 1000 ? Math.round(b.sales / 100) / 10 + 'k' : String(b.sales) }
+          };
+        })
+      }]
+    });
+  }
+  function disposeChart() {
+    if (UI.chart) { try { UI.chart.dispose(); } catch (e) { /* noop */ } UI.chart = null; }
+  }
+
+  /* ---------------------- 写入台账 ---------------------- */
+  function updateWriteBtn(st) {
+    var btn = $('intelWriteBtn');
+    var note = $('intelWriteState');
+    if (!btn) return;
+    var summary = buildSummary(st);
+    btn.disabled = !summary;
+    if (!summary) {
+      note.textContent = st.comp || st.kw || st.rev ? '示例数据仅用于体验，不写入台账；请导入真实导出表' : '';
+      return;
+    }
+    var c = ctx();
+    var fp = stateKey(c);
+    var rec = window.Ledger.find(fp);
+    if (rec && rec.intel) {
+      note.textContent = '上次写入 ' + rec.intel.time + ' · 再次点击将覆盖更新';
+    } else {
+      note.textContent = rec ? '将把 ' + summary.sources.join(' + ') + ' 的结论写入台账记录' :
+        '当前产品尚未存入台账，写入前请先点顶栏「存为台账」';
+    }
+  }
+
+  function writeToLedger() {
+    var st = ds();
+    var c = ctx();
+    if (!st || !c) return;
+    var summary = buildSummary(st);
+    if (!summary) { toast('没有可写入的导入数据结论（示例数据不入台账）'); return; }
+    var fp = stateKey(c);
+    var rec = window.Ledger.find(fp);
+    if (!rec) {
+      toast('「' + c.name + '」尚未存入台账：请先点顶栏「存为台账」冻结参数快照，再写入情报结论');
+      return;
+    }
+    // 情报结论属于「标注类」附加信息：用 patch 写入，不新增快照版本、不改动快照时间口径
+    window.Ledger.patch(fp, { intel: summary });
+    if (window.LedgerUI) window.LedgerUI.render();
+    updateWriteBtn(st);
+    toast('情报结论已写入台账「' + c.name + '」（' + summary.sources.join(' + ') + '）');
+  }
+
+  /* ---------------------- 事件绑定 ---------------------- */
+  function bind() {
+    var section = $('sec-intel');
+    if (!section) return;
+
+    section.addEventListener('click', function (e) {
+      var open = e.target.closest('[data-intel-open]');
+      if (open) { openPanel(open.dataset.intelOpen); return; }
+      var sample = e.target.closest('[data-intel-sample]');
+      if (sample) {
+        var key = sample.dataset.intelSample;
+        openPanel(key, SAMPLES[key]);
+        return;
+      }
+      if (e.target.closest('#intelImpParse')) { parseImport(); return; }
+      if (e.target.closest('#intelImpApply')) {
+        var isSample = $('intelImpText').value.trim() === SAMPLES[UI.activeTpl].trim();
+        applyImport(isSample ? 'sample' : 'imp');
+        return;
+      }
+      if (e.target.closest('#intelImpCancel')) { $('intelImport').style.display = 'none'; return; }
+      if (e.target.closest('#intelWriteBtn')) { writeToLedger(); return; }
+    });
+
+    section.addEventListener('change', function (e) {
+      var col = e.target.closest('[data-intel-col]');
+      if (col) {
+        UI.mapping[Number(col.dataset.intelCol)] = col.value;
+        updateApplyState();
+        return;
+      }
+      if (e.target.id === 'intelImpFile') {
+        var f = e.target.files && e.target.files[0];
+        if (!f) return;
+        var rd = new FileReader();
+        rd.onload = function () { $('intelImpText').value = String(rd.result || ''); parseImport(); };
+        rd.readAsText(f, 'utf-8');
+      }
+    });
+
+    window.addEventListener('resize', function () { if (UI.chart) UI.chart.resize(); });
+  }
+
+  window.IntelUI = { render: render, bind: bind };
 })();
 
 </script>
@@ -4461,6 +5288,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     renderRisk();
     renderRecommend();
     renderData();
+    if (window.IntelUI) window.IntelUI.render();
     if (window.LedgerUI) window.LedgerUI.render();
 
     $('pageTitle').textContent = '选品分析 · ' + p.name;
@@ -4807,11 +5635,24 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
       renderAll();
       window.scrollTo({ top: 0, behavior: 'smooth' });
       toast('已切换至候选产品「' + rec.name + '」');
+    },
+    // 竞品情报等自治模块读取当前产品上下文的唯一入口
+    context: function () {
+      var p = PRODUCTS[state.index];
+      return {
+        name: p.name,
+        category: p.category,
+        profileKey: profileKeyOf(p),
+        market: engState(p).market,
+        price: priceOf(p),
+        suggested: suggested(p)
+      };
     }
   };
 
   /* ============================ 初始化 ============================ */
   if (window.LedgerUI) window.LedgerUI.bind();
+  if (window.IntelUI) window.IntelUI.bind();
   renderAll();
 })();
 
