@@ -3,7 +3,16 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e293b">
+<meta name="description" content="跨境电商选品智能体：机会评分 / 竞争分析 / 利润测算 / 合规与风险 / 决策台账。本地优先，可选择性开启云同步。">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="选品智能体">
 <title>选品智能体 · 交互原型</title>
 
 <style>
@@ -738,7 +747,7 @@
   tr.lg-ver-cur td { background: var(--accent-soft); font-weight: 600; }
   .lg-ver-tag { font-size: 10px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 4px; }
 
-  .lg-cmp { margin-top: 20px; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px 16px; background: var(--surface-2); }
+  .lg-cmp { margin-top: 20px; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px 16px; background: var(--surface-2); overflow-x: auto; }
   .lg-cmp-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 12px; flex-wrap: wrap; }
   .lg-cmp-tip { margin-top: 16px; font-size: 12px; color: var(--muted); }
   table.lg-cmp-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 12px; background: var(--surface); }
@@ -831,8 +840,118 @@
     .intel-cards { grid-template-columns: 1fr; }
     .intel-grid { grid-template-columns: 1fr; }
   }
+
+  /* === 云同步（可选 · Supabase）设置面板 === */
+  .sync-card[role="button"] { cursor: pointer; }
+  .sync-card[role="button"]:hover { background: rgba(148, 163, 184, 0.18); }
+  .sync-dot.off { background: #94a3b8; }
+  .sync-dot.warn { background: #f59e0b; }
+  .sync-dot.err { background: #dc2626; }
+  .sync-state {
+    border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px;
+    background: var(--surface-2); font-size: 12.5px; color: var(--ink-2); line-height: 1.7;
+  }
+  .sync-state b { color: var(--ink); }
+  .sync-state .s-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    margin-right: 6px; vertical-align: middle; background: #94a3b8;
+  }
+  .sync-state .s-dot.ok { background: var(--green); }
+  .sync-state .s-dot.warn { background: var(--amber); }
+  .sync-state .s-dot.err { background: var(--red); }
+  .sync-row { display: flex; gap: 8px; align-items: center; }
+  .sync-row input { flex: 1; min-width: 0; }
+  .sync-check { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+  .sync-check input { width: 16px; height: 16px; flex: 0 0 auto; }
+  .sync-sql { margin-top: 14px; font-size: 12.5px; }
+  .sync-sql summary { cursor: pointer; color: var(--accent); }
+  .sync-sql textarea { margin-top: 8px; font-family: var(--font-mono); font-size: 11.5px; height: 148px; }
+  .sync-risk {
+    margin-top: 14px; border: 1px solid var(--amber-line); background: var(--amber-soft);
+    border-radius: 10px; padding: 11px 13px; font-size: 12px; color: #7c4a03; line-height: 1.75;
+  }
+  .sync-risk b { color: #78350f; }
+
+  /* === 移动端 / 触控适配：让手机与电脑都能独立使用 === */
+  html { -webkit-text-size-adjust: 100%; }
+  body { -webkit-tap-highlight-color: transparent; }
+  button, a, .nav-item, .tab-btn, .lg-btn, .icon-btn, input, select, textarea { touch-action: manipulation; }
+
+  /* 动态视口高度：iOS Safari 地址栏收放时 100vh 会溢出 */
+  .app { min-height: 100vh; min-height: 100dvh; }
+  .sidebar { height: 100vh; height: 100dvh; }
+  /* 安全区：刘海屏 / 手势条 / 圆角 */
+  .topbar {
+    padding-left: calc(24px + env(safe-area-inset-left));
+    padding-right: calc(24px + env(safe-area-inset-right));
+  }
+  .content { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+  .sidebar {
+    padding-left: calc(14px + env(safe-area-inset-left));
+    padding-right: calc(14px + env(safe-area-inset-right));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+  .toast { bottom: calc(32px + env(safe-area-inset-bottom)); }
+
+  /* 横向滚动提示：仅在表格确实溢出时显示（由 app.js 判定并加 .show） */
+  .scroll-hint { display: none; margin: 8px 2px 0; font-size: 11px; color: var(--muted); }
+  .scroll-hint.show { display: block; }
+
+  /* 回顶部浮层按钮 */
+  .fab {
+    position: fixed; right: calc(16px + env(safe-area-inset-right));
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    z-index: 120; width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2);
+    box-shadow: var(--shadow-md); display: none; place-items: center; cursor: pointer;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+  }
+  .fab.show { display: grid; }
+  .fab:hover { background: var(--surface-2); }
+  .fab svg { width: 18px; height: 18px; }
+
+  @media (max-width: 768px) {
+    /* iOS 对字号 <16px 的输入控件会自动放大页面，这里统一抬到 16px 抑制 */
+    input, select, textarea,
+    .f-field input[type="text"], .f-field input[type="number"], .f-field select,
+    .lg-note, .lg-dec, .imp-textarea { font-size: 16px; }
+    /* 触控热区不小于 42px */
+    .nav-item { min-height: 42px; }
+    .lg-link, .lg-btn, .tab-add { min-height: 34px; align-items: center; }
+    .lg-link { display: inline-flex; }
+    /* 顶栏操作区单行横向滑动，避免换行把表格挤下去 */
+    .topbar { flex-wrap: nowrap; }
+    .topbar-actions {
+      flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px; scrollbar-width: none;
+    }
+    .topbar-actions::-webkit-scrollbar { display: none; }
+    .tab-strip { flex-wrap: nowrap; }
+    /* 图表高度收敛，减少移动端首屏占用 */
+    .intel-chart { height: 190px; }
+    .gauge-chart { width: 156px; height: 156px; }
+    .gauge-center .gauge-num { font-size: 34px; }
+    .table-wrap { max-height: none; }
+  }
+  @media (max-width: 480px) {
+    .topbar { min-height: 56px; padding-top: 8px; padding-bottom: 8px; gap: 8px; }
+    .content { padding: 12px 10px calc(40px + env(safe-area-inset-bottom)); }
+    .module { padding: 15px 12px 12px; border-radius: 12px; }
+    .module-head { margin-bottom: 14px; padding-bottom: 10px; }
+    .module-head h2 { font-size: 15.5px; }
+    .page-title { font-size: 14px; }
+    .icon-btn { width: 36px; height: 36px; }
+    .btn { padding: 7px 10px; font-size: 12px; }
+    .metric-grid { gap: 10px; }
+    .metric { padding: 11px 12px; }
+    .metric .m-value { font-size: 19px; }
+    .dialog { padding: 18px 16px; }
+    .intel-metrics .im { min-width: 84px; }
+    .fab { width: 42px; height: 42px; }
+  }
+
   @media print {
-    .sidebar, .topbar-actions, .sidebar-overlay, .toast, .overlay { display: none !important; }
+    .sidebar, .topbar-actions, .sidebar-overlay, .toast, .overlay, .fab, .scroll-hint { display: none !important; }
     body { background: #fff; }
     .module { break-inside: avoid; box-shadow: none; border-color: #ccc; }
   }
@@ -905,12 +1024,16 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"></path></svg>
         <span>参数设置</span>
       </button>
+      <button class="nav-item" type="button" id="navSync" data-act="open-sync">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4 4 0 0 1 .6-8A5.5 5.5 0 0 1 18 8.6 3.7 3.7 0 0 1 17.5 18z"></path><path d="M12 11.4v4.8"></path><path d="M9.9 13.5 12 11.4l2.1 2.1"></path></svg>
+        <span>云同步</span>
+      </button>
     </nav>
 
     <div class="sidebar-foot">
-      <div class="sync-card">
-        <strong><span class="sync-dot" aria-hidden="true"></span>离线单机运行</strong>
-        数据仅存本地浏览器 · 不上传云端<br>
+      <div class="sync-card" id="syncCard" role="button" tabindex="0" title="点击配置云同步（可选）">
+        <strong><span class="sync-dot off" id="syncDot" aria-hidden="true"></span><span id="syncCardTitle">本地优先 · 未配置同步</span></strong>
+        台账默认仅存本机浏览器；启用云同步后才会上传至你自建的 Supabase 空间。<br>
         费率 / 关税 / 合规规则·需按官方公告核对
       </div>
     </div>
@@ -1342,7 +1465,7 @@
         <div id="ledgerCompare"></div>
 
         <p class="prd-note">
-          <b>台账口径与风险提示：</b>每条记录是<b>保存时刻的参数快照</b>与当时规则库的计算结果；此后费率、关税、合规规则若有调整，历史记录<b>不会自动重算</b>，如需最新口径请在该候选产品上重新「存为台账」。记录中的证据强度沿用数据来源分级（公开 / 付费第三方 / 用户导入 / 估算），<b>估算值须由用户核对后使用</b>。台账仅存储于本机浏览器，不上传云端；更换设备或清理浏览器数据前请先「导出台账」备份。<b>本工具输出不构成投资建议，也不包含任何价格点位预测。</b>
+          <b>台账口径与风险提示：</b>每条记录是<b>保存时刻的参数快照</b>与当时规则库的计算结果；此后费率、关税、合规规则若有调整，历史记录<b>不会自动重算</b>，如需最新口径请在该候选产品上重新「存为台账」。记录中的证据强度沿用数据来源分级（公开 / 付费第三方 / 用户导入 / 估算），<b>估算值须由用户核对后使用</b>。台账<b>默认仅存储于本机浏览器</b>；仅当你主动在「云同步」中配置并开启后，才会同步至你自建的 Supabase 空间。更换设备或清理浏览器数据前请先「导出台账」备份。<b>本工具输出不构成投资建议，也不包含任何价格点位预测。</b>
         </p>
       </section>
 
@@ -1429,6 +1552,63 @@
     <ul class="step-list" id="stepList"></ul>
   </div>
 </div>
+
+<!-- 云同步（可选）设置面板 -->
+<div class="overlay" id="syncOverlay">
+  <div class="dialog wide" role="dialog" aria-modal="true" aria-labelledby="syncTitle">
+    <h3 id="syncTitle">云同步（可选 · 自建 Supabase）</h3>
+    <p class="d-sub">本地优先：未配置时应用完全离线可用，台账只存本机浏览器。配置后，台账会在本机与云端<b>双向合并</b>，手机与电脑共用同一份记录。</p>
+
+    <div class="sync-state" id="syncState"></div>
+
+    <div class="form-grid" style="margin-top:14px">
+      <label class="f-field">
+        <span class="f-label">Supabase 项目 URL</span>
+        <input type="text" id="syncUrl" placeholder="https://xxxxxxxxxxxx.supabase.co" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="f-field">
+        <span class="f-label">anon public key（Supabase → Settings → API 里复制）</span>
+        <input type="text" id="syncKey" placeholder="eyJhbGciOiJIUzI1NiIs…" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="f-field">
+        <span class="f-label">同步空间码（各设备填同一个，相当于账号）</span>
+        <span class="sync-row">
+          <input type="text" id="syncSpace" placeholder="例如：shop-7f3a91c2d5" autocomplete="off" spellcheck="false">
+          <button class="lg-btn" type="button" id="syncGenSpace">随机生成</button>
+        </span>
+      </label>
+      <label class="sync-check">
+        <input type="checkbox" id="syncAuto"> <span>自动同步（打开应用时、以及台账变更后自动双向合并）</span>
+      </label>
+    </div>
+
+    <details class="sync-sql">
+      <summary>首次使用：展开复制建表 SQL（在 Supabase → SQL Editor 运行一次即可）</summary>
+      <textarea class="imp-textarea" id="syncSql" readonly spellcheck="false"></textarea>
+      <div class="rec-actions" style="margin-top:8px">
+        <button class="lg-btn" type="button" id="syncCopySql">复制 SQL</button>
+      </div>
+    </details>
+
+    <div class="sync-risk">
+      <b>隐私与安全提示：</b>启用后，台账（含产品名、成本、毛利、决策备注）会以 JSON 形式写入<b>你自己创建</b>的 Supabase 表，不再只留在本机；请勿在备注中写入客户名单、账号口令等敏感信息。anon key 是可公开的客户端密钥，任何人同时拿到 URL + anon key + 空间码即可读写该表，因此空间码请使用随机长串并妥善保管。同步采用「双向合并」策略：同一产品的快照取较新的一份、历史版本取更长的一份，<b>但在一台设备上删除记录不会同步删除另一台设备的记录</b>，如需彻底清理请在各设备分别删除。该功能仅为可选的跨设备便利功能，计算口径与结论仍以本机规则库为准，<b>不构成任何投资建议</b>。
+    </div>
+
+    <p class="f-error" id="syncError" role="alert"></p>
+    <p class="form-tip" id="syncLast"></p>
+    <div class="rec-actions">
+      <button class="btn btn-primary" type="button" id="syncNow">立即双向同步</button>
+      <button class="btn btn-ghost" type="button" id="syncTest">测试连接</button>
+      <button class="btn btn-ghost" type="button" id="syncSave">保存配置</button>
+      <button class="btn btn-ghost" type="button" id="syncOff">断开并清除配置</button>
+      <button class="btn btn-ghost" type="button" id="syncClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="fabTop" type="button" title="回到顶部" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg>
+</button>
 
 <script>/* inlined: ./_shared/js/echarts.min.js */
 
@@ -2859,6 +3039,9 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     var r = find(fp);
     if (!r) return null;
     for (var k in fields) { if (fields.hasOwnProperty(k)) r[k] = fields[k]; }
+    // annotatedAt 单独记录「标注类改动」的时间，仅用于云同步时判定两端备注/决策谁更新；
+    // 它不参与台账排序与时间口径（排序仍以 updatedAt 为准）。
+    r.annotatedAt = Date.now();
     write();
     return r;
   }
@@ -4803,6 +4986,402 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   };
 })();
 </script>
+<script>/* inlined: ./assets/sync.js */
+// assets/sync.js — 可选云同步（自建 Supabase）：本地优先 + 双向合并
+// 设计要点：
+//   1. 未配置时零网络请求，应用完全离线可用；不引入任何第三方 JS 依赖（只用浏览器原生 fetch）。
+//   2. 配置后，台账在「本机 localStorage」与「Supabase 表」之间双向合并（按指纹 fp：
+//      同一产品的快照取 updatedAt 较新的一方，历史版本取更长的一方，标注取 annotatedAt 较新的一方）。
+//   3. 配置（项目 URL / anon key / 空间码）只存本机 localStorage，随应用一起不跨设备。
+//   4. 任何网络/权限失败都只提示原因，不删除也不覆盖本机已有台账数据。
+// 依赖：assets/store.js（window.Ledger）
+(function () {
+  'use strict';
+
+  var CFG_KEY = 'xuanpin.sync.v1';
+  var TABLE = 'xp_spaces';
+  var TIMEOUT_MS = 15000;
+  var AUTO_DEBOUNCE = 2500;
+
+  var U = { url: '', key: '', space: '', auto: false, lastAt: 0, lastResult: '', lastState: 'off' };
+  var busy = false, autoTimer;
+
+  var SQL = [
+    'create table if not exists ' + TABLE + ' (',
+    '  space      text primary key,',
+    '  payload    jsonb not null,',
+    '  updated_at timestamptz not null default now()',
+    ');',
+    '',
+    'alter table ' + TABLE + ' enable row level security;',
+    '',
+    'create policy "xp_spaces_anon_rw" on ' + TABLE,
+    '  for all to anon',
+    '  using (true) with check (true);',
+    '',
+    '-- 说明：anon key 是可公开的客户端密钥，上述策略允许持有它的客户端读写本表；',
+    '-- 空间码即事实上的访问口令，请使用随机长串，不要泄露给他人。'
+  ].join('\n');
+
+  /* ------------------------- 基础工具 ------------------------- */
+  function $(id) { return document.getElementById(id); }
+  function nowIso() { return new Date().toISOString(); }
+  function extend(a, b) { for (var k in b) { if (b.hasOwnProperty(k)) a[k] = b[k]; } return a; }
+  function stamp(ts) {
+    if (!ts) return '—';
+    var d = new Date(ts);
+    function p(n) { return String(n).padStart(2, '0'); }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function genSpace() {
+    var hex = '';
+    for (var i = 0; i < 12; i++) hex += '0123456789abcdef'.charAt(Math.floor(Math.random() * 16));
+    return 'shop-' + hex;
+  }
+  function normalizeUrl(u) {
+    u = String(u || '').trim();
+    u = u.replace(/\/+$/, '');
+    u = u.replace(/\/rest\/v1$/i, '');
+    return u;
+  }
+  function configured() { return !!(U.url && U.key && U.space); }
+  function endpoint() { return normalizeUrl(U.url) + '/rest/v1/' + TABLE; }
+  function headers() { return { 'apikey': U.key, 'Authorization': 'Bearer ' + U.key, 'Content-Type': 'application/json' }; }
+
+  /* ------------------------- 配置持久化 ------------------------- */
+  function loadCfg() {
+    try {
+      var d = JSON.parse(window.localStorage.getItem(CFG_KEY) || '{}');
+      if (d && typeof d === 'object') {
+        U.url = d.url || ''; U.key = d.key || ''; U.space = d.space || '';
+        U.auto = !!d.auto; U.lastAt = d.lastAt || 0;
+        U.lastResult = d.lastResult || '';
+        U.lastState = d.lastState || (U.url && U.key && U.space ? 'off' : 'off');
+      }
+    } catch (e) { /* 配置损坏：视为未配置，不影响本地台账 */ }
+  }
+  function saveCfg() {
+    try { window.localStorage.setItem(CFG_KEY, JSON.stringify(U)); return true; }
+    catch (e) { say('err', '同步配置无法写入本机存储（可能被禁用或超出配额），本次配置不会持久化。'); return false; }
+  }
+  function clearCfg() {
+    U = { url: '', key: '', space: '', auto: false, lastAt: 0, lastResult: '', lastState: 'off' };
+    try { window.localStorage.removeItem(CFG_KEY); } catch (e) { /* 忽略 */ }
+  }
+
+  /* ------------------------- 网络请求 ------------------------- */
+  function req(method, url, body, extra) {
+    var opt = { method: method, headers: extend(headers(), extra || {}) };
+    if (body != null) opt.body = JSON.stringify(body);
+    var ctl = null, to = null;
+    if (typeof AbortController !== 'undefined') {
+      ctl = new AbortController();
+      opt.signal = ctl.signal;
+      to = setTimeout(function () { ctl.abort(); }, TIMEOUT_MS);
+    }
+    return fetch(url, opt).then(
+      function (r) { if (to) clearTimeout(to); return r; },
+      function (e) { if (to) clearTimeout(to); throw e; }
+    );
+  }
+
+  function friendlyErr(err) {
+    if (!err) return '未知错误';
+    if (err.name === 'AbortError') return '连接超时（' + (TIMEOUT_MS / 1000) + ' 秒）：请检查网络或 Supabase 项目地址。';
+    if (err.name === 'TypeError') {
+      if (location.protocol === 'file:') {
+        return '请求被浏览器拦截：以 file:// 直接打开单文件版时，跨域请求来源为 null 常被拒绝。云同步请在 https 线上地址（或手机浏览器打开线上地址）中配置。';
+      }
+      return '网络请求失败：可能是离线、项目地址写错，或网络策略不允许访问 Supabase。';
+    }
+    return err.message || String(err);
+  }
+
+  function tableErr(status, text) {
+    var code = '';
+    try { code = (JSON.parse(text) || {}).code || ''; } catch (e) { /* 非 JSON 响应 */ }
+    if (status === 404 || code === '42P01' || code === 'PGRST205') {
+      return '云端表未创建：请先在设置面板里展开并复制建表 SQL，到 Supabase → SQL Editor 运行一次。';
+    }
+    if (status === 401 || status === 403) return 'anon key 无效或无权访问该表（HTTP ' + status + '）。';
+    if (code === '42501') return '行级安全策略拒绝了本次读写：请确认建表 SQL 中的 RLS 策略已执行。';
+    if (status === 409) return '云端冲突（HTTP 409）：请重试；若反复出现请检查表主键是否为 space 字段。';
+    return '云端请求失败（HTTP ' + status + '）：' + String(text || '').slice(0, 160);
+  }
+
+  /* ------------------------- 合并算法 ------------------------- */
+  // 合并本机与云端记录：快照取较新、历史取更长、标注取 annotatedAt 较新；
+  // 本机独有的记录一律保留（不做跨设备删除），云端独有的记录并入。
+  function mergeDocs(local, remote) {
+    var map = {}, order = [];
+    local.forEach(function (r) { if (r && r.fp) { map[r.fp] = r; order.push(r.fp); } });
+    remote.forEach(function (r) {
+      if (!r || !r.fp || !r.snap) return;
+      var cur = map[r.fp];
+      if (!cur) { map[r.fp] = r; order.push(r.fp); return; }
+      var rSnapNewer = (r.updatedAt || 0) > (cur.updatedAt || 0);
+      var hist = (r.history || []).length > (cur.history || []).length ? (r.history || []) : (cur.history || []);
+      if (rSnapNewer) { cur.snap = r.snap; cur.updatedAt = r.updatedAt; }
+      if (hist.length) cur.history = hist.slice(-(window.Ledger.MAX_HISTORY || 12));
+      var la = cur.annotatedAt || 0, ra = r.annotatedAt || 0, src = cur;
+      if (ra > la) src = r;
+      else if (la === ra) src = cur.note || !r.note ? cur : r;
+      if (src.decision) cur.decision = src.decision;
+      if (typeof src.note === 'string') cur.note = src.note;
+      if (src.tags) cur.tags = src.tags;
+      cur.annotatedAt = Math.max(la, ra);
+    });
+    return order.map(function (fp) { return map[fp]; });
+  }
+
+  function payloadFrom(records) {
+    return {
+      schema: window.Ledger.SCHEMA || 1,
+      savedAt: Date.now(),
+      note: '选品智能体 · 台账同步副本（双向合并）。费率为保存时刻的规则库估算值，须按官方公告核对。',
+      records: records
+    };
+  }
+
+  /* ------------------------- 同步主流程 ------------------------- */
+  function doSync(silent) {
+    if (busy) return;
+    if (!configured()) {
+      if (!silent) say('err', '请先填写项目 URL / anon key / 空间码，并点击「保存配置」。');
+      return;
+    }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      U.lastState = 'off'; U.lastResult = '当前离线，已跳过本次云同步（本机数据不受影响）';
+      saveCfg(); renderCard(); setStatus('off', U.lastResult);
+      return;
+    }
+    busy = true;
+    clearErr();
+    setStatus('warn', '同步中：正在读取云端台账并与本机双向合并…');
+
+    var url = endpoint() + '?space=eq.' + encodeURIComponent(U.space) + '&select=payload,updated_at';
+    req('GET', url).then(function (res) {
+      if (!res.ok) return res.text().then(function (t) { throw new Error(tableErr(res.status, t)); });
+      return res.json();
+    }).then(function (rows) {
+      var remote = (rows && rows[0] && rows[0].payload && Array.isArray(rows[0].payload.records))
+        ? rows[0].payload.records : [];
+      var local = window.Ledger.list();
+      var merged = mergeDocs(local, remote);
+      // 合并结果先落地本机（即便随后推送失败，本机也已经是并集，不会丢数据）
+      window.Ledger.importJSON(JSON.stringify({ schema: window.Ledger.SCHEMA, records: merged }), 'replace');
+      return req('POST', endpoint(),
+        [{ space: U.space, payload: payloadFrom(merged), updated_at: nowIso() }],
+        { 'Prefer': 'resolution=merge-duplicates,return=minimal' }
+      ).then(function (r2) {
+        if (!r2.ok && r2.status !== 201 && r2.status !== 204) {
+          return r2.text().then(function (t) { throw new Error(tableErr(r2.status, t)); });
+        }
+        return { local: local.length, remote: remote.length, merged: merged.length };
+      });
+    }).then(function (st) {
+      busy = false;
+      U.lastAt = Date.now(); U.lastState = 'ok';
+      U.lastResult = '已同步 · 本机 ' + st.local + ' 条 / 云端 ' + st.remote + ' 条 → 合并后 ' + st.merged + ' 条';
+      saveCfg();
+      setStatus('ok', U.lastResult);
+      renderCard(); renderLast();
+      if (window.LedgerUI && window.LedgerUI.render) window.LedgerUI.render();
+    }).then(null, function (err) {
+      busy = false;
+      var msg = friendlyErr(err);
+      U.lastAt = Date.now(); U.lastState = 'err'; U.lastResult = msg;
+      saveCfg();
+      setStatus('err', msg);
+      renderCard(); renderLast();
+      if (!silent) say('err', msg);
+    });
+  }
+
+  function testConn() {
+    readForm();
+    if (!U.url || !U.key) { say('err', '测试连接至少需要填写项目 URL 与 anon key。'); return; }
+    clearErr();
+    setStatus('warn', '正在测试连接…');
+    var url = endpoint() + '?select=space&limit=1';
+    req('GET', url).then(function (res) {
+      if (!res.ok) return res.text().then(function (t) { throw new Error(tableErr(res.status, t)); });
+      return res.json();
+    }).then(function () {
+      setStatus('ok', '连接正常：已成功访问表 ' + TABLE + '。' + (configured() ? '' : '（还需填写空间码才能同步）'));
+    }).then(null, function (err) {
+      var msg = friendlyErr(err);
+      setStatus('err', msg);
+      say('err', msg);
+    });
+  }
+
+  /* ------------------------- 界面反馈 ------------------------- */
+  function clearErr() { var e = $('syncError'); if (e) { e.textContent = ''; e.classList.remove('show'); } }
+  function say(kind, msg) {
+    if (kind === 'err') {
+      var e = $('syncError');
+      if (e) { e.textContent = msg; e.classList.add('show'); }
+    }
+    var l = $('syncLast');
+    if (l) l.textContent = msg;
+  }
+  function setStatus(state, text) {
+    var el = $('syncState');
+    if (!el) return;
+    el.innerHTML = '<span class="s-dot ' + (state === 'ok' ? 'ok' : state === 'warn' ? 'warn' : state === 'err' ? 'err' : '') +
+      '"></span>' + text;
+  }
+  function renderLast() {
+    var l = $('syncLast');
+    if (!l) return;
+    l.textContent = U.lastAt ? '上次同步：' + stamp(U.lastAt) + ' · ' + (U.lastResult || '') : '尚未同步过。启用后首次同步会以「合并」方式完成。';
+  }
+  function renderCard() {
+    var dot = $('syncDot'), t = $('syncCardTitle');
+    if (!dot || !t) return;
+    dot.className = 'sync-dot ' + (U.lastState === 'ok' ? '' : U.lastState === 'err' ? 'err' : 'off');
+    if (!configured()) t.textContent = '本地优先 · 未配置同步';
+    else if (U.lastState === 'ok') t.textContent = '云同步 · 已连接' + (U.auto ? ' · 自动' : ' · 手动');
+    else if (U.lastState === 'err') t.textContent = '云同步 · 上次失败';
+    else t.textContent = '云同步 · 待同步' + (U.auto ? ' · 自动' : '');
+  }
+  function readForm() {
+    U.url = normalizeUrl(($('syncUrl') || {}).value || '');
+    U.key = (($('syncKey') || {}).value || '').trim();
+    U.space = (($('syncSpace') || {}).value || '').trim();
+    U.auto = !!($('syncAuto') && $('syncAuto').checked);
+  }
+  function fillForm() {
+    var a = $('syncUrl'), b = $('syncKey'), c = $('syncSpace'), d = $('syncAuto');
+    if (a) a.value = U.url; if (b) b.value = U.key; if (c) c.value = U.space; if (d) d.checked = !!U.auto;
+    var s = $('syncSql'); if (s) s.value = SQL;
+  }
+  function copyText(el) {
+    if (!el) return;
+    var txt = el.value || el.textContent || '';
+    var done = function () { say('ok', '已复制到剪贴板。'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallback(); });
+    } else { fallback(); }
+    function fallback() {
+      try {
+        el.removeAttribute('readonly');
+        el.select();
+        document.execCommand('copy');
+        el.setAttribute('readonly', 'readonly');
+        done();
+      } catch (e) { say('err', '复制失败，请手动选中文本复制。'); }
+    }
+  }
+
+  function open() {
+    closeSidebar();
+    fillForm();
+    if (!configured()) {
+      setStatus('off', '未配置：应用完全离线可用，台账只存本机浏览器。填写下方三项并保存后，手机与电脑即可共用同一份台账。');
+    } else {
+      setStatus(U.lastState === 'ok' ? 'ok' : U.lastState === 'err' ? 'err' : 'warn',
+        (U.lastState === 'err' ? '上次同步失败：' : '已配置：') + (U.lastResult || '点「立即双向同步」开始。'));
+    }
+    renderLast();
+    var d = $('syncOverlay');
+    if (d) d.classList.add('show');
+  }
+  function close() { var d = $('syncOverlay'); if (d) d.classList.remove('show'); }
+  function closeSidebar() {
+    var sb = $('sidebar'), ov = $('sidebarOverlay');
+    if (sb && sb.classList.contains('open')) sb.classList.remove('open');
+    if (ov) ov.classList.remove('show');
+  }
+
+  /* ------------------------- 台账变更监听 ------------------------- */
+  // 包一层 Ledger 的写操作，仅用于在变更后触发「自动同步」，不改变原有行为与返回值。
+  function hookLedger() {
+    if (!window.Ledger) return;
+    ['upsert', 'patch', 'remove', 'clear', 'importJSON'].forEach(function (k) {
+      var orig = window.Ledger[k];
+      if (typeof orig !== 'function') return;
+      window.Ledger[k] = function () {
+        var r = orig.apply(window.Ledger, arguments);
+        try { window.dispatchEvent(new Event('xp-ledger-changed')); } catch (e) { /* 忽略 */ }
+        return r;
+      };
+    });
+  }
+
+  function bind() {
+    loadCfg();
+    hookLedger();
+    renderCard();
+    var d = $('syncOverlay');
+    if (!d) return;
+
+    $('syncClose').addEventListener('click', close);
+    d.addEventListener('click', function (e) { if (e.target === d) close(); });
+
+    $('syncGenSpace').addEventListener('click', function () { $('syncSpace').value = genSpace(); });
+    $('syncCopySql').addEventListener('click', function () { copyText($('syncSql')); });
+    $('syncTest').addEventListener('click', testConn);
+    $('syncSave').addEventListener('click', function () {
+      readForm(); saveCfg();
+      if (!configured()) say('err', '三项都填写后才能开启同步（URL / anon key / 空间码）。');
+      else say('ok', '配置已保存在本机浏览器；点「立即双向同步」可立刻合并一次。');
+      renderCard();
+      if (!configured()) setStatus('off', '未配置：应用完全离线可用，台账只存本机浏览器。');
+      else if (U.lastState !== 'ok') setStatus('warn', '已保存配置，尚未同步：点下方「立即双向同步」开始。');
+    });
+    $('syncNow').addEventListener('click', function () {
+      readForm(); saveCfg(); renderCard(); doSync(false);
+    });
+    $('syncOff').addEventListener('click', function () {
+      if (!window.confirm('确定断开云同步并清除本机保存的 URL / anon key / 空间码吗？\n\n本机台账数据不会被删除，只是不再自动同步。')) return;
+      clearCfg(); fillForm(); clearErr(); renderCard(); renderLast();
+      setStatus('off', '已断开并清除同步配置。本机台账保留；如需再次同步请重新填写三项配置。');
+      say('ok', '已断开云同步，本机台账未受影响。');
+    });
+
+    var card = $('syncCard');
+    if (card) {
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    }
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('[data-act="open-sync"]') : null;
+      if (btn) { e.preventDefault(); open(); }
+    });
+    window.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+    // 自动同步：台账变更后防抖触发（同步过程中触发的变更会被 busy 短路，避免自激）
+    window.addEventListener('xp-ledger-changed', function () {
+      if (!U.auto || !configured() || busy) return;
+      clearTimeout(autoTimer);
+      autoTimer = setTimeout(function () { doSync(true); }, AUTO_DEBOUNCE);
+    });
+    window.addEventListener('online', function () {
+      if (U.auto && configured() && U.lastState === 'err') setTimeout(function () { doSync(true); }, 800);
+    });
+
+    // 启动时若已启用自动同步，稍等主界面渲染完成后静默合并一次
+    if (U.auto && configured()) setTimeout(function () { doSync(true); }, 1200);
+    renderLast();
+  }
+
+  window.SyncUI = {
+    bind: bind,
+    render: function () { renderCard(); renderLast(); },
+    open: open,
+    close: close,
+    sync: doSync,
+    config: function () { return extend({}, U); },
+    mergeDocs: mergeDocs,
+    SQL: SQL
+  };
+})();
+
+</script>
 <script>/* inlined: ./assets/app.js */
 // assets/app.js — 选品智能体原型：Mock 数据与交互逻辑
 (function () {
@@ -6385,12 +6964,64 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     }
   };
 
+  /* ============================ 移动端：表格滚动提示 ============================ */
+  // 仅在表格确实横向溢出时提示「左右滑动」，避免窄屏用户误以为内容缺失。
+  function refreshScrollHints() {
+    var wraps = document.querySelectorAll('.table-wrap, .lg-table-wrap, .lg-cmp');
+    Array.prototype.forEach.call(wraps, function (wrap) {
+      var hint = wrap.nextElementSibling;
+      if (!hint || !hint.classList || !hint.classList.contains('scroll-hint')) {
+        hint = document.createElement('div');
+        hint.className = 'scroll-hint';
+        wrap.parentNode.insertBefore(hint, wrap.nextSibling);
+      }
+      var over = wrap.scrollWidth - wrap.clientWidth;
+      if (over > 8) {
+        var cols = wrap.querySelectorAll('table thead th').length;
+        hint.textContent = '↔' + (cols ? ' 共 ' + cols + ' 列，' : ' ') + '左右滑动查看全部';
+        hint.classList.add('show');
+      } else {
+        hint.classList.remove('show');
+        hint.textContent = '';
+      }
+    });
+  }
+  var hintTimer;
+  function queueScrollHints() { clearTimeout(hintTimer); hintTimer = setTimeout(refreshScrollHints, 30); }
+  window.addEventListener('resize', queueScrollHints);
+  window.addEventListener('orientationchange', function () { setTimeout(refreshScrollHints, 320); });
+
+  /* ============================ 移动端：回顶部浮层 ============================ */
+  var fabTop = $('fabTop');
+  if (fabTop) {
+    fabTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    window.addEventListener('scroll', function () {
+      fabTop.classList.toggle('show', window.scrollY > 480);
+    }, { passive: true });
+  }
+
   /* ============================ 初始化 ============================ */
   if (window.LedgerUI) window.LedgerUI.bind();
   if (window.IntelUI) window.IntelUI.bind();
+  if (window.SyncUI) window.SyncUI.bind();
   renderAll();
+  refreshScrollHints();
+  // 台账勾选/增删会改变可见表格，重新判定是否需要滚动提示
+  document.addEventListener('click', queueScrollHints);
+  window.addEventListener('xp-ledger-changed', queueScrollHints);
 })();
 
+</script>
+<script>
+/* PWA 离线能力：仅在同源 http(s) 下注册 Service Worker。
+   file:// 直接双击打开单文件版时，浏览器不允许注册 SW，此处自动跳过，不影响离线使用。 */
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function () { /* 注册失败不影响主体功能 */ });
+  });
+})();
 </script>
 </body>
 </html>
