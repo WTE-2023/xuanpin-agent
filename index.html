@@ -679,6 +679,82 @@
   .imp-dataset b { color: var(--ink); }
   .dialog.wide { width: min(760px, 100%); }
 
+  /* === 选品决策台账 === */
+  .ledger-toolbar { display: flex; align-items: flex-start; gap: 12px 18px; flex-wrap: wrap; justify-content: space-between; margin-bottom: 14px; }
+  .lg-stat { font-size: 12px; color: var(--muted); line-height: 1.9; }
+  .lg-stat-item { display: inline-block; margin-right: 18px; }
+  .lg-stat-item strong { color: var(--ink-2); }
+  .lg-warn { display: block; margin-top: 6px; padding: 7px 11px; border-radius: 8px; background: var(--amber-soft); border: 1px solid var(--amber-line); color: #92400e; font-size: 11.5px; line-height: 1.6; max-width: 620px; }
+  .lg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lg-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px;
+    border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface);
+    color: var(--ink-2); font-size: 12.5px; cursor: pointer; transition: all var(--transition-fast);
+  }
+  .lg-btn:hover { background: var(--surface-2); border-color: #cbd5e1; }
+  .lg-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22); }
+  .lg-btn.primary:hover { background: #1d4ed8; }
+  .lg-btn:disabled { opacity: 0.42; cursor: not-allowed; }
+  .lg-empty { border: 1px dashed #cbd5e1; border-radius: var(--radius-sm); padding: 22px 20px; background: var(--surface-2); }
+  .lg-empty b { display: block; font-size: 13.5px; margin-bottom: 6px; }
+  .lg-empty p { font-size: 12.5px; color: var(--muted); line-height: 1.75; max-width: 780px; }
+
+  .lg-table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+  table.lg-table { width: 100%; min-width: 1060px; border-collapse: collapse; font-size: 12.5px; }
+  table.lg-table thead th { text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); padding: 10px; border-bottom: 1px solid var(--rule); background: var(--surface-2); white-space: nowrap; }
+  th[data-lg-sort] { cursor: pointer; user-select: none; }
+  th[data-lg-sort]:hover { color: var(--accent); }
+  .lg-sort { margin-left: 3px; color: #cbd5e1; font-size: 10px; }
+  .lg-sort.on { color: var(--accent); }
+  table.lg-table td { padding: 9px 10px; border-bottom: 1px solid var(--rule-soft); vertical-align: middle; color: var(--ink-2); }
+  tr.lg-row.picked td { background: var(--accent-soft); }
+  .lg-num { font-family: var(--font-mono); white-space: nowrap; }
+  .lg-strong { font-weight: 700; color: var(--ink); }
+  .lg-sub2 { font-size: 11px; color: var(--muted); }
+  .lg-name { font-weight: 600; color: var(--ink); }
+  .lg-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .lg-c-check { width: 34px; }
+  .lg-c-check input { width: 14px; height: 14px; cursor: pointer; }
+  .lg-ev { display: inline-flex; align-items: center; gap: 6px; }
+  .lg-ev-ct { font-size: 10.5px; color: var(--muted); font-family: var(--font-mono); }
+  .lg-c-act { white-space: nowrap; }
+  .lg-link { background: none; border: none; padding: 0; margin-right: 10px; font-size: 11.5px; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .lg-link:hover { color: var(--accent-dark); }
+  .lg-link.danger { color: var(--red); }
+  .lg-dec { padding: 4px 7px; border-radius: 6px; border: 1px solid var(--rule); font-family: inherit; font-size: 11.5px; background: var(--surface); cursor: pointer; }
+  .lg-dec.dg-sample { border-color: #93c5fd; color: #1d4ed8; background: var(--accent-soft); }
+  .lg-dec.dg-order { border-color: var(--green-line); color: #15803d; background: var(--green-soft); }
+  .lg-dec.dg-drop { border-color: var(--red-line); color: #b91c1c; background: var(--red-soft); }
+  .lg-note-row td { padding: 0 10px 10px; border-bottom: 1px solid var(--rule-soft); background: #fbfdff; }
+  .lg-note { width: 100%; padding: 6px 9px; border: 1px solid var(--rule); border-radius: 6px; font-family: inherit; font-size: 12px; color: var(--ink); background: var(--surface); }
+  .lg-note:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .lg-hist { padding: 2px 0 8px; }
+  .lg-hist-h { font-size: 12px; font-weight: 600; color: var(--ink-2); margin-bottom: 8px; }
+  .lg-hist-note { display: block; font-weight: 400; font-size: 11px; color: var(--muted); margin-top: 2px; }
+  table.lg-hist-table { width: 100%; border-collapse: collapse; font-size: 11.5px; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+  table.lg-hist-table th { background: var(--surface-2); text-align: left; font-size: 10.5px; color: var(--muted); font-weight: 600; padding: 6px 9px; }
+  table.lg-hist-table td { padding: 6px 9px; border-top: 1px solid var(--rule-soft); color: var(--ink-2); }
+  tr.lg-ver-cur td { background: var(--accent-soft); font-weight: 600; }
+  .lg-ver-tag { font-size: 10px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 4px; }
+
+  .lg-cmp { margin-top: 20px; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px 16px; background: var(--surface-2); }
+  .lg-cmp-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 12px; flex-wrap: wrap; }
+  .lg-cmp-tip { margin-top: 16px; font-size: 12px; color: var(--muted); }
+  table.lg-cmp-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 12px; background: var(--surface); }
+  table.lg-cmp-table th, table.lg-cmp-table td { border: 1px solid var(--rule); padding: 8px 10px; text-align: right; font-family: var(--font-mono); }
+  table.lg-cmp-table th { font-family: var(--font-ui); background: var(--surface-2); }
+  th.lg-cmp-key { text-align: left !important; font-weight: 600; color: var(--ink-2); white-space: nowrap; font-size: 11.5px; }
+  .lg-cmp-name { font-weight: 700; font-size: 12.5px; color: var(--ink); }
+  .lg-cmp-meta { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 3px; font-size: 10.5px; color: var(--muted); font-family: var(--font-ui); }
+  .lg-dec-chip { padding: 1px 6px; border-radius: 4px; font-size: 10px; border: 1px solid var(--rule); }
+  .lg-dec-chip.dg-sample { background: var(--accent-soft); border-color: #93c5fd; color: #1d4ed8; }
+  .lg-dec-chip.dg-order { background: var(--green-soft); border-color: var(--green-line); color: #15803d; }
+  .lg-dec-chip.dg-drop { background: var(--red-soft); border-color: var(--red-line); color: #b91c1c; }
+  .lg-cmp-val.best { background: var(--green-soft); color: #15803d; font-weight: 700; }
+  .lg-cmp-val.worst { background: var(--red-soft); color: #b91c1c; font-weight: 700; }
+  .lg-cmp-note { margin-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.7; }
+
   /* === Responsive === */
   @media (max-width: 1024px) {
     .sidebar {
@@ -775,9 +851,9 @@
 
     <nav class="nav-group" aria-label="工具">
       <div class="nav-group-title">工具</div>
-      <button class="nav-item" type="button" data-todo="历史分析">
+      <button class="nav-item" type="button" data-target="sec-ledger">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"></path><path d="M3 4v4h4"></path><path d="M12 8v4.5l3 1.8"></path></svg>
-        <span>历史分析</span>
+        <span>选品台账</span>
       </button>
       <button class="nav-item" type="button" data-todo="参数设置">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"></path></svg>
@@ -809,6 +885,10 @@
         <button class="btn btn-ghost" type="button" id="importBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"></path><path d="M7 8l5-5 5 5"></path><path d="M4 20h16"></path></svg>
           <span class="btn-label">导入数据</span>
+        </button>
+        <button class="btn btn-ghost" type="button" data-act="save-ledger" id="saveLedgerBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 4v5h6V4"></path><path d="M9 13h6v7H9z"></path></svg>
+          <span class="btn-label">存为台账</span>
         </button>
         <button class="btn btn-ghost" type="button" data-act="export">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 20h16"></path></svg>
@@ -1111,6 +1191,55 @@
         <p class="prd-note">
           <b>证据强度定义：</b>公开数据（平台公开页面 / 官方公告 / 政府数据库）＞ 付费第三方（Keepa / 卖家精灵导出）＞ 用户导入（报价单 / 成本表）＞ 估算/规则库（按公开费率推算）。
           本工具所有计算结果均标注来源与证据强度，<b>估算值必须由用户核对后使用</b>；本工具输出不构成投资建议，亦不包含任何价格点位预测。
+        </p>
+      </section>
+
+      <!-- 09 选品决策台账 -->
+      <section class="module" id="sec-ledger" aria-labelledby="h-ledger">
+        <div class="module-head">
+          <span class="idx">09</span>
+          <h2 id="h-ledger">选品决策台账</h2>
+          <p class="module-desc">把每次测算冻结为可回溯的记录：参数快照留痕 · 决策状态 · 横向对比 · 本地持久化</p>
+        </div>
+
+        <div class="ledger-toolbar">
+          <div class="lg-stat" id="ledgerStats"></div>
+          <div class="lg-actions">
+            <button class="lg-btn primary" type="button" id="lgCompareBtn" disabled>对比所选（0）</button>
+            <button class="lg-btn" type="button" id="lgImportBtn">导入台账</button>
+            <button class="lg-btn" type="button" id="lgExportBtn">导出台账</button>
+            <button class="lg-btn" type="button" id="lgWipeBtn">清空台账</button>
+            <input type="file" id="lgFile" accept=".json,application/json" hidden>
+          </div>
+        </div>
+
+        <div id="ledgerEmpty"></div>
+
+        <div class="lg-table-wrap">
+          <table class="lg-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th data-lg-sort="name">产品 / 版本 <span class="lg-sort" data-lg-arrow="name">↕</span></th>
+                <th data-lg-sort="marketName">市场 <span class="lg-sort" data-lg-arrow="marketName">↕</span></th>
+                <th>决策状态</th>
+                <th data-lg-sort="price">售价 <span class="lg-sort" data-lg-arrow="price">↕</span></th>
+                <th data-lg-sort="landed">到岸成本 <span class="lg-sort" data-lg-arrow="landed">↕</span></th>
+                <th data-lg-sort="margin">毛利率 <span class="lg-sort" data-lg-arrow="margin">↕</span></th>
+                <th data-lg-sort="overall">综合评分 <span class="lg-sort" data-lg-arrow="overall">↕</span></th>
+                <th data-lg-sort="evidence">数据证据 <span class="lg-sort" data-lg-arrow="evidence">↕</span></th>
+                <th data-lg-sort="updatedAt">快照更新 <span class="lg-sort" data-lg-arrow="updatedAt">↕</span></th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+        </div>
+
+        <div id="ledgerCompare"></div>
+
+        <p class="prd-note">
+          <b>台账口径与风险提示：</b>每条记录是<b>保存时刻的参数快照</b>与当时规则库的计算结果；此后费率、关税、合规规则若有调整，历史记录<b>不会自动重算</b>，如需最新口径请在该候选产品上重新「存为台账」。记录中的证据强度沿用数据来源分级（公开 / 付费第三方 / 用户导入 / 估算），<b>估算值须由用户核对后使用</b>。台账仅存储于本机浏览器，不上传云端；更换设备或清理浏览器数据前请先「导出台账」备份。<b>本工具输出不构成投资建议，也不包含任何价格点位预测。</b>
         </p>
       </section>
 
@@ -2487,6 +2616,685 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
 })();
 
 </script>
+<script>/* inlined: ./assets/store.js */
+// assets/store.js — 选品决策台账：本地持久化（localStorage）与记录模型
+// 职责范围：只做「存取 + 校验 + 版本留痕」，不含任何界面与业务计算。
+// 设计要点：
+//   1. 同一「产品名 + 品类 + 目标市场」视为同一条台账记录（指纹 fp），重复保存 = 新增一个版本，旧快照压入 history 留痕。
+//   2. 存储不可用（隐私模式 / 配额溢出 / 数据损坏）时不静默丢数据：降级到内存并给出原因，交由界面提示用户。
+(function () {
+  'use strict';
+
+  var KEY = 'xuanpin.ledger.v1';
+  var SCHEMA = 1;          // 记录结构版本，结构变更时用于迁移
+  var MAX_HISTORY = 12;    // 每条记录保留最近 12 版参数快照
+
+  var memory = { schema: SCHEMA, records: [] };
+  var degradeReason = '';
+
+  // 探测 localStorage 可用性（隐私模式 / 禁用站点数据会抛错）
+  var canPersist = (function () {
+    try {
+      var probe = '__xp_probe__';
+      window.localStorage.setItem(probe, '1');
+      window.localStorage.removeItem(probe);
+      return true;
+    } catch (e) {
+      degradeReason = '当前浏览器禁用了本地存储（隐私模式或站点数据受限），本次记录只保存在内存中，关闭页面后会丢失。';
+      return false;
+    }
+  })();
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function read() {
+    if (!canPersist) return memory;
+    try {
+      var raw = window.localStorage.getItem(KEY);
+      if (!raw) return memory;
+      var d = JSON.parse(raw);
+      if (!d || !Array.isArray(d.records)) return memory;
+      memory = { schema: SCHEMA, records: d.records };
+    } catch (e) {
+      // 数据损坏：先备份原始内容再重来，避免用户既有数据被直接抹掉
+      try {
+        window.localStorage.setItem(KEY + '.corrupt.' + Date.now(), window.localStorage.getItem(KEY) || '');
+      } catch (e2) { /* 备份失败也不阻断 */ }
+      memory = { schema: SCHEMA, records: [] };
+      degradeReason = '检测到本地台账数据损坏，已备份原数据并重置为空台账。';
+    }
+    return memory;
+  }
+
+  function write() {
+    if (!canPersist) return false;
+    try {
+      window.localStorage.setItem(KEY, JSON.stringify(memory));
+      return true;
+    } catch (e) {
+      degradeReason = '本地存储写入失败（可能已超出浏览器配额），最新改动未能持久化。';
+      return false;
+    }
+  }
+
+  function uid() {
+    return 'lg_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function fingerprint(rec) {
+    return [
+      String(rec.name || '').trim().toLowerCase(),
+      rec.profileKey || '',
+      rec.market || ''
+    ].join('|');
+  }
+
+  function list() { return read().records; }
+
+  function find(fp) {
+    read();
+    for (var i = 0; i < memory.records.length; i++) {
+      if (memory.records[i].fp === fp) return memory.records[i];
+    }
+    return null;
+  }
+
+  /**
+   * 写入一条台账记录。同指纹则更新版本（旧快照进 history），否则新建。
+   * rec: { name, category, profileKey, market, decision?, note?, tags?, snap, updatedAt? }
+   */
+  function upsert(rec) {
+    read();
+    var fp = fingerprint(rec);
+    var ts = rec.updatedAt || Date.now();
+    var cur = find(fp);
+
+    if (cur) {
+      if (cur.snap) {
+        cur.history = cur.history || [];
+        cur.history.push({ ts: cur.snap.ts || cur.updatedAt, snap: cur.snap });
+        if (cur.history.length > MAX_HISTORY) cur.history = cur.history.slice(-MAX_HISTORY);
+      }
+      cur.name = rec.name;
+      cur.category = rec.category;
+      cur.profileKey = rec.profileKey;
+      cur.market = rec.market;
+      cur.snap = rec.snap;
+      cur.updatedAt = ts;
+      if (rec.decision) cur.decision = rec.decision;
+      if (rec.note != null) cur.note = rec.note;
+      if (rec.tags) cur.tags = rec.tags;
+      write();
+      return { record: cur, created: false, version: (cur.history || []).length + 1 };
+    }
+
+    var record = {
+      id: uid(),
+      fp: fp,
+      name: rec.name,
+      category: rec.category,
+      profileKey: rec.profileKey,
+      market: rec.market,
+      decision: rec.decision || 'evaluating',
+      note: rec.note || '',
+      tags: rec.tags || [],
+      createdAt: ts,
+      updatedAt: ts,
+      history: [],
+      snap: rec.snap
+    };
+    memory.records.unshift(record);
+    write();
+    return { record: record, created: true, version: 1 };
+  }
+
+  // 局部更新（决策状态 / 备注 / 标签）
+  // 注意：不修改 updatedAt —— 该字段表示「最近一次参数快照的保存时间」，
+  // 若被标注类改动刷新，会让台账里的时间口径失真，并导致按时间排序时行位置乱跳。
+  function patch(fp, fields) {
+    read();
+    var r = find(fp);
+    if (!r) return null;
+    for (var k in fields) { if (fields.hasOwnProperty(k)) r[k] = fields[k]; }
+    write();
+    return r;
+  }
+
+  function remove(fp) {
+    read();
+    for (var i = 0; i < memory.records.length; i++) {
+      if (memory.records[i].fp === fp) {
+        var r = memory.records[i];
+        memory.records.splice(i, 1);
+        write();
+        return r;
+      }
+    }
+    return null;
+  }
+
+  function clear() {
+    memory = { schema: SCHEMA, records: [] };
+    write();
+  }
+
+  function exportJSON() {
+    return JSON.stringify({
+      schema: SCHEMA,
+      exportedAt: new Date().toISOString(),
+      note: '选品智能体 · 决策台账导出。快照中的费率为保存时刻的规则库估算值，须按官方最新公告核对。',
+      records: list()
+    }, null, 2);
+  }
+
+  /**
+   * 导入台账 JSON。mode: 'merge'（同指纹取更新的快照与更长的历史）| 'replace'（同指纹整体覆盖）
+   */
+  function importJSON(text, mode) {
+    var d = JSON.parse(text);
+    var incoming = (d && Array.isArray(d.records)) ? d.records : (Array.isArray(d) ? d : null);
+    if (!incoming) throw new Error('文件格式不正确：未找到 records 数组');
+    read();
+    var added = 0, merged = 0;
+    incoming.forEach(function (r) {
+      if (!r || !r.name || !r.snap) return;
+      r.fp = r.fp || fingerprint(r);
+      var cur = find(r.fp);
+      if (cur && mode !== 'replace') {
+        if ((r.history || []).length > (cur.history || []).length) cur.history = r.history;
+        if ((r.updatedAt || 0) > (cur.updatedAt || 0)) { cur.snap = r.snap; cur.updatedAt = r.updatedAt; }
+        merged++;
+        return;
+      }
+      if (cur) {
+        for (var i = 0; i < memory.records.length; i++) {
+          if (memory.records[i].fp === r.fp) { memory.records[i] = r; break; }
+        }
+      } else {
+        memory.records.push(r);
+      }
+      added++;
+    });
+    write();
+    return { added: added, merged: merged, total: memory.records.length };
+  }
+
+  function stats() {
+    var rs = list();
+    return { count: rs.length, canPersist: canPersist, degradeReason: degradeReason };
+  }
+
+  window.Ledger = {
+    SCHEMA: SCHEMA,
+    MAX_HISTORY: MAX_HISTORY,
+    list: list,
+    find: find,
+    upsert: upsert,
+    patch: patch,
+    remove: remove,
+    clear: clear,
+    stats: stats,
+    exportJSON: exportJSON,
+    importJSON: importJSON,
+    fingerprint: fingerprint,
+    clone: clone
+  };
+})();
+
+</script>
+<script>/* inlined: ./assets/ledger.js */
+// assets/ledger.js — 选品决策台账界面：列表 / 排序 / 决策状态 / 版本留痕 / 横向对比
+// 依赖：assets/store.js（window.Ledger，纯持久化）、assets/engine.js（window.Engine，证据强度字典）
+// 由 app.js 在 renderAll() 后调用 LedgerUI.render()；本文件不依赖 app.js 内部状态，仅通过 window.XPApp 回调跳转产品。
+(function () {
+  'use strict';
+
+  var DECISIONS = [
+    { key: 'evaluating', label: '待评估', cls: 'dg-eval' },
+    { key: 'sampling', label: '已取样 / 试销', cls: 'dg-sample' },
+    { key: 'ordered', label: '已下单', cls: 'dg-order' },
+    { key: 'dropped', label: '已放弃', cls: 'dg-drop' }
+  ];
+  var DEC_MAP = {};
+  DECISIONS.forEach(function (d) { DEC_MAP[d.key] = d; });
+
+  // 横向对比指标行：better 决定高亮方向（high=越高越好 / low=越低越好 / none=仅展示）
+  var CMP_ROWS = [
+    { k: 'marketName', label: '目标市场', type: 'text' },
+    { k: 'price', label: '售价', type: 'num', fmt: yuan, better: 'none' },
+    { k: 'landed', label: '到岸成本（含关税）', type: 'num', fmt: yuan, better: 'low' },
+    { k: 'totalCost', label: '单件总成本', type: 'num', fmt: yuan, better: 'low' },
+    { k: 'profit', label: '单件毛利', type: 'num', fmt: yuan, better: 'high' },
+    { k: 'margin', label: '毛利率', type: 'pct', better: 'high' },
+    { k: 'breakevenAcos', label: '保本 ACOS', type: 'pct', better: 'high' },
+    { k: 'priceForTarget', label: '25% 目标毛利所需售价', type: 'num', fmt: yuan, better: 'none' },
+    { k: 'purchaseMax', label: '可承受最高采购价', type: 'num', fmt: yuan, better: 'high' },
+    { k: 'monthlyProfit', label: '月净利（扣月固定成本）', type: 'num', fmt: yuan, better: 'high' },
+    { k: 'roi', label: '年化 ROI', type: 'pct', better: 'high' },
+    { k: 'cashTied', label: '首批备货资金占用', type: 'num', fmt: yuan, better: 'low' },
+    { k: 'cycleDays', label: '资金周转天数', type: 'num', fmt: function (v) { return v + ' 天'; }, better: 'low' },
+    { k: 'fbaTier', label: 'FBA 分段', type: 'text' },
+    { k: 'overall', label: '综合评分', type: 'num', fmt: function (v) { return v + ' 分'; }, better: 'high' },
+    { k: 'mandatoryCompliance', label: '强制合规项', type: 'num', fmt: function (v) { return v + ' 项'; }, better: 'low' },
+    { k: 'certCostMax', label: '认证成本上限', type: 'num', fmt: yuan, better: 'low' },
+    { k: 'highRisks', label: '高风险项', type: 'num', fmt: function (v) { return v + ' 项'; }, better: 'low' },
+    { k: 'ipScore', label: '知产风险分（越高越危险）', type: 'num', fmt: function (v) { return v + ' 分'; }, better: 'low' },
+    { k: 'evidence', label: '数据证据强度', type: 'text' }
+  ];
+
+  var UI = { sortKey: 'updatedAt', sortDir: -1, selected: {}, expanded: {}, lastCount: 0 };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function yuan(n) {
+    if (n == null || !isFinite(n)) return '—';
+    return '¥' + Math.round(n).toLocaleString('en-US');
+  }
+  function pct(n) {
+    if (n == null || !isFinite(n)) return '—';
+    return (Math.round(n * 10) / 10).toFixed(1) + '%';
+  }
+  function evBadge(k, label) {
+    var e = window.Engine.ev(k);
+    return '<span class="ev-badge ev-' + e.key + '" title="' + esc(e.desc) + '">' + esc(label || e.short) + '</span>';
+  }
+  function stamp(ts) {
+    var d = new Date(ts || Date.now());
+    function p(n) { return String(n).padStart(2, '0'); }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  /* ---------------------- 取值 ---------------------- */
+  function valOf(rec, key) {
+    if (key === 'name') return rec.name;
+    if (key === 'updatedAt') return rec.updatedAt;
+    if (key === 'marketName') {
+      var m = window.Engine.MARKETS.filter(function (x) { return x.key === rec.market; })[0];
+      return (m && m.name) || rec.market;
+    }
+    if (key === 'evidence') {
+      var ec = (rec.snap && rec.snap.evidenceCount) || { imp: 0, est: 0 };
+      return { imp: ec.imp, est: ec.est };
+    }
+    return rec.snap ? rec.snap[key] : undefined;
+  }
+
+  function evidenceCell(rec) {
+    var ec = (rec.snap && rec.snap.evidenceCount) || { imp: 0, est: 0 };
+    var head = ec.imp > 0 ? 'imp' : 'est';
+    var tip = '导入数据字段 ' + ec.imp + ' 个 · 估算/规则库字段 ' + ec.est + ' 个' +
+      (rec.snap && rec.snap.manualOverrides ? ' · 手工调整 ' + rec.snap.manualOverrides + ' 个' : '');
+    return '<span class="lg-ev" title="' + esc(tip) + '">' + evBadge(head) +
+      '<span class="lg-ev-ct">导 ' + ec.imp + ' / 估 ' + ec.est + '</span></span>';
+  }
+
+  /* ---------------------- 列表排序 ---------------------- */
+  function sortRecords(recs) {
+    var dir = UI.sortDir;
+    var key = UI.sortKey;
+    return recs.slice().sort(function (a, b) {
+      var va = valOf(a, key), vb = valOf(b, key);
+      if (key === 'evidence') { va = va.imp; vb = vb.imp; }
+      if (typeof va === 'string' || typeof vb === 'string') {
+        return String(va || '').localeCompare(String(vb || ''), 'zh-Hans-CN') * dir;
+      }
+      if (va == null || !isFinite(va)) return 1;
+      if (vb == null || !isFinite(vb)) return -1;
+      return (va - vb) * dir;
+    });
+  }
+
+  function updateArrows() {
+    var section = $('sec-ledger');
+    if (!section) return;
+    Array.prototype.forEach.call(section.querySelectorAll('[data-lg-arrow]'), function (el) {
+      var on = UI.sortKey === el.dataset.lgArrow;
+      el.textContent = on ? (UI.sortDir === 1 ? '↑' : '↓') : '↕';
+      el.classList.toggle('on', on);
+    });
+  }
+
+  /* ---------------------- 主渲染 ---------------------- */
+  function render() {
+    var body = $('ledgerBody');
+    if (!body) return;
+    updateArrows();
+
+    var st = window.Ledger.stats();
+    var recs = window.Ledger.list();
+    UI.lastCount = recs.length;
+
+    // 清掉已不存在的选中项，避免删除后残留
+    var alive = {};
+    recs.forEach(function (r) { alive[r.fp] = 1; });
+    Object.keys(UI.selected).forEach(function (fp) { if (!alive[fp]) delete UI.selected[fp]; });
+
+    $('ledgerStats').innerHTML =
+      '<span class="lg-stat-item">台账记录 <strong>' + recs.length + '</strong> 条</span>' +
+      '<span class="lg-stat-item">持久化 <strong>' + (st.canPersist ? '已启用（本地浏览器）' : '不可用 · 仅内存') + '</strong></span>' +
+      (recs.length ? '<span class="lg-stat-item">最近快照 <strong>' + stamp(Math.max.apply(null, recs.map(function (r) { return r.updatedAt; }))) + '</strong></span>' : '');
+    if (st.degradeReason) {
+      $('ledgerStats').innerHTML += '<span class="lg-warn">' + esc(st.degradeReason) + '</span>';
+    }
+
+    var toggleBtn = $('lgCompareBtn');
+    var picked = Object.keys(UI.selected).filter(function (fp) { return alive[fp]; });
+    toggleBtn.textContent = '对比所选（' + picked.length + '）';
+    toggleBtn.disabled = picked.length < 2;
+
+    if (!recs.length) {
+      $('ledgerEmpty').innerHTML =
+        '<div class="lg-empty">' +
+        '<b>台账为空</b>' +
+        '<p>在当前候选产品上点击顶栏「存为台账」即可建一条记录。记录会冻结保存时刻的参数快照与证据强度，' +
+        '同一产品再次保存将新增一个版本并保留历史，便于日后复盘与横向对比。</p>' +
+        '</div>';
+      body.innerHTML = '';
+      $('ledgerCompare').innerHTML = '';
+      return;
+    }
+    $('ledgerEmpty').innerHTML = '';
+
+    var sorted = sortRecords(recs);
+    body.innerHTML = sorted.map(function (rec) {
+      var s = rec.snap || {};
+      var d = DEC_MAP[rec.decision] || DECISIONS[0];
+      var on = UI.selected[rec.fp] ? ' checked' : '';
+      var ver = (rec.history || []).length + 1;
+      var row =
+        '<tr class="lg-row' + (UI.selected[rec.fp] ? ' picked' : '') + '" data-fp="' + esc(rec.fp) + '">' +
+          '<td class="lg-c-check"><input type="checkbox" data-lg-pick="' + esc(rec.fp) + '"' + on +
+            ' aria-label="选择 ' + esc(rec.name) + ' 用于对比"></td>' +
+          '<td class="lg-c-name">' +
+            '<div class="lg-name">' + esc(rec.name) + (rec.custom ? ' <span class="t-flag">自建</span>' : '') + '</div>' +
+            '<div class="lg-sub">' + esc(rec.category || '') + ' · 版本 ' + ver +
+            (ver > 1 ? ' <button class="lg-link" type="button" data-lg-hist="' + esc(rec.fp) + '">查看历史</button>' : '') +
+            '</div>' +
+          '</td>' +
+          '<td>' + esc(valOf(rec, 'marketName')) + '</td>' +
+          '<td class="lg-c-dec">' + decisionSelect(rec) + '</td>' +
+          '<td class="lg-num">' + yuan(s.price) + '</td>' +
+          '<td class="lg-num">' + yuan(s.landed) + '</td>' +
+          '<td class="lg-num lg-strong">' + pct(s.margin) + '</td>' +
+          '<td class="lg-num">' + (s.overall != null ? s.overall + ' 分' : '—') + '</td>' +
+          '<td class="lg-c-ev">' + evidenceCell(rec) + '</td>' +
+          '<td class="lg-num lg-sub2">' + stamp(rec.updatedAt) + '</td>' +
+          '<td class="lg-c-act">' +
+            '<button class="lg-link" type="button" data-lg-go="' + esc(rec.fp) + '">查看</button>' +
+            '<button class="lg-link danger" type="button" data-lg-del="' + esc(rec.fp) + '">删除</button>' +
+          '</td>' +
+        '</tr>';
+
+      // 内联备注行：始终可见，便于随手记录决策依据
+      row +=
+        '<tr class="lg-note-row" data-fp="' + esc(rec.fp) + '">' +
+          '<td></td><td colspan="10"><input class="lg-note" type="text" placeholder="决策备注 / 下一步动作（自动保存到本地）" ' +
+            'maxlength="160" data-lg-note="' + esc(rec.fp) + '" value="' + esc(rec.note || '') + '"></td></tr>';
+
+      if (UI.expanded[rec.fp]) row += historyRow(rec);
+      return row;
+    }).join('');
+
+    renderCompare(picked);
+  }
+
+  function decisionSelect(rec) {
+    var opts = DECISIONS.map(function (d) {
+      return '<option value="' + d.key + '"' + (rec.decision === d.key ? ' selected' : '') + '>' + d.label + '</option>';
+    }).join('');
+    var d = DEC_MAP[rec.decision] || DECISIONS[0];
+    return '<select class="lg-dec ' + d.cls + '" data-lg-dec="' + esc(rec.fp) + '" aria-label="决策状态">' + opts + '</select>';
+  }
+
+  // 版本留痕：列出该记录的每一次参数快照及其关键指标
+  function historyRow(rec) {
+    var versions = (rec.history || []).slice().reverse().map(function (h, i, arr) {
+      var s = h.snap || {};
+      return { label: 'v' + (arr.length - i), ts: h.ts, snap: s };
+    });
+    versions.unshift({ label: 'v' + ((rec.history || []).length + 1), ts: rec.snap && rec.snap.ts, snap: rec.snap || {}, current: true });
+
+    var rows = versions.map(function (v) {
+      var ec = v.snap.evidenceCount || { imp: 0, est: 0 };
+      return '<tr class="' + (v.current ? 'lg-ver-cur' : '') + '">' +
+        '<td>' + v.label + (v.current ? ' <span class="lg-ver-tag">当前</span>' : '') + '</td>' +
+        '<td>' + stamp(v.ts) + '</td>' +
+        '<td class="lg-num">' + yuan(v.snap.price) + '</td>' +
+        '<td class="lg-num">' + yuan(v.snap.landed) + '</td>' +
+        '<td class="lg-num">' + pct(v.snap.margin) + '</td>' +
+        '<td class="lg-num">' + (v.snap.overall != null ? v.snap.overall + ' 分' : '—') + '</td>' +
+        '<td>导 ' + ec.imp + ' / 估 ' + ec.est + '</td>' +
+        '</tr>';
+    }).join('');
+
+    return '<tr class="lg-hist-row"><td></td><td colspan="10">' +
+      '<div class="lg-hist"><div class="lg-hist-h">参数快照留痕（同一产品的历次保存，按时间倒序）' +
+      '<span class="lg-hist-note">费率与规则随年度调整，历史版本不会自动重算，用于复盘当时的判断依据。</span></div>' +
+      '<table class="lg-hist-table"><thead><tr><th>版本</th><th>保存时间</th><th>售价</th><th>到岸成本</th><th>毛利率</th><th>综合评分</th><th>证据</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table></div></td></tr>';
+  }
+
+  /* ---------------------- 横向对比 ---------------------- */
+  function renderCompare(picked) {
+    var host = $('ledgerCompare');
+    if (!host) return;
+    if (picked.length < 2) {
+      host.innerHTML = picked.length === 1
+        ? '<div class="lg-cmp-tip">已选 1 条，再勾选至少 1 条即可生成横向对比表。</div>'
+        : '';
+      return;
+    }
+    var recs = picked.map(function (fp) { return window.Ledger.find(fp); }).filter(Boolean);
+    if (recs.length < 2) { host.innerHTML = ''; return; }
+
+    var head = '<tr><th class="lg-cmp-key">指标</th>' + recs.map(function (r) {
+      var d = DEC_MAP[r.decision] || DECISIONS[0];
+      return '<th><div class="lg-cmp-name">' + esc(r.name) + '</div>' +
+        '<div class="lg-cmp-meta"><span class="lg-dec-chip ' + d.cls + '">' + d.label + '</span>' +
+        '<span>' + esc(valOf(r, 'marketName')) + '</span></div></th>';
+    }).join('') + '</tr>';
+
+    var body = CMP_ROWS.map(function (row) {
+      var vals = recs.map(function (r) { return rowValue(r, row); });
+      var best = null, worst = null;
+      if (row.better === 'high' || row.better === 'low') {
+        var nums = vals.filter(function (v) { return typeof v.n === 'number' && isFinite(v.n); });
+        if (nums.length > 1) {
+          var sortedN = nums.map(function (v) { return v.n; }).sort(function (a, b) { return a - b; });
+          best = row.better === 'high' ? sortedN[sortedN.length - 1] : sortedN[0];
+          worst = row.better === 'high' ? sortedN[0] : sortedN[sortedN.length - 1];
+          if (best === worst) { best = null; worst = null; }
+        }
+      }
+      var tds = vals.map(function (v) {
+        var cls = 'lg-cmp-val';
+        if (best != null && v.n === best) cls += ' best';
+        else if (worst != null && v.n === worst) cls += ' worst';
+        return '<td class="' + cls + '">' + v.html + '</td>';
+      }).join('');
+      return '<tr><th class="lg-cmp-key">' + row.label + '</th>' + tds + '</tr>';
+    }).join('');
+
+    host.innerHTML =
+      '<div class="lg-cmp"><div class="lg-cmp-head">横向对比（' + recs.length + ' 个候选产品）' +
+      '<button class="lg-link" type="button" data-lg-clear>清空选择</button></div>' +
+      '<div class="lg-table-wrap"><table class="lg-cmp-table"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+      '<p class="lg-cmp-note">绿色＝同指标更优、红色＝更差；「到岸成本 / 资金占用 / 合规项 / 风险项」越低越好，「毛利 / ROI / 评分」越高越好。' +
+      '所有数值为各记录保存时刻的快照，不同时间保存的记录其费率口径可能不同，横向对比时请一并核对保存时间与证据强度。</p></div>';
+  }
+
+  function rowValue(rec, row) {
+    if (row.k === 'evidence') {
+      var ec = (rec.snap && rec.snap.evidenceCount) || { imp: 0, est: 0 };
+      return { n: ec.imp, html: evidenceCell(rec) };
+    }
+    var raw = valOf(rec, row.k);
+    var html;
+    if (row.type === 'pct') html = pct(raw);
+    else if (row.type === 'num') html = row.fmt ? row.fmt(raw) : (raw == null ? '—' : raw);
+    else html = raw == null || raw === '' ? '—' : esc(raw);
+    return { n: typeof raw === 'number' ? raw : null, html: html };
+  }
+
+  /* ---------------------- 交互 ---------------------- */
+  function bind() {
+    var section = $('sec-ledger');
+    if (!section) return;
+
+    section.addEventListener('click', function (e) {
+      var t = e.target;
+
+      var pick = t.closest('[data-lg-pick]');
+      if (pick) {
+        var fp1 = pick.dataset.lgPick;
+        if (pick.checked) UI.selected[fp1] = 1; else delete UI.selected[fp1];
+        render();
+        return;
+      }
+      var go = t.closest('[data-lg-go]');
+      if (go && window.XPApp) { window.XPApp.focusByFp(go.dataset.lgGo); return; }
+      var hist = t.closest('[data-lg-hist]');
+      if (hist) {
+        var fp2 = hist.dataset.lgHist;
+        if (UI.expanded[fp2]) delete UI.expanded[fp2]; else UI.expanded[fp2] = 1;
+        render();
+        return;
+      }
+      var del = t.closest('[data-lg-del]');
+      if (del) {
+        var rec = window.Ledger.find(del.dataset.lgDel);
+        if (!rec) return;
+        if (!window.confirm('删除台账记录「' + rec.name + '」（含全部历史版本）？该操作不可撤销。')) return;
+        window.Ledger.remove(rec.fp);
+        delete UI.selected[rec.fp];
+        delete UI.expanded[rec.fp];
+        render();
+        toast('已删除台账记录「' + rec.name + '」');
+        return;
+      }
+      if (t.closest('[data-lg-clear]')) {
+        UI.selected = {};
+        render();
+        return;
+      }
+      var th = t.closest('[data-lg-sort]');
+      if (th) { window.LedgerUI.sortBy(th.dataset.lgSort); return; }
+    });
+
+    section.addEventListener('change', function (e) {
+      var dec = e.target.closest('[data-lg-dec]');
+      if (dec) {
+        window.Ledger.patch(dec.dataset.lgDec, { decision: dec.value });
+        render();
+        var rec = window.Ledger.find(dec.dataset.lgDec);
+        toast('「' + (rec ? rec.name : '') + '」决策状态更新为「' + (DEC_MAP[dec.value] || {}).label + '」');
+      }
+    });
+
+    section.addEventListener('input', function (e) {
+      var note = e.target.closest('[data-lg-note]');
+      if (!note) return;
+      window.Ledger.patch(note.dataset.lgNote, { note: note.value });
+    });
+
+    var cmpBtn = $('lgCompareBtn');
+    if (cmpBtn) {
+      cmpBtn.addEventListener('click', function () {
+        var picked = Object.keys(UI.selected);
+        if (picked.length < 2) return;
+        renderCompare(picked);
+        var host = $('ledgerCompare');
+        if (host) host.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+
+    var expBtn = $('lgExportBtn');
+    if (expBtn) {
+      expBtn.addEventListener('click', function () {
+        if (!window.Ledger.list().length) { toast('台账为空，暂无可导出的记录'); return; }
+        var stampStr = new Date().toISOString().slice(0, 10);
+        download('选品决策台账-' + stampStr + '.json', window.Ledger.exportJSON(), 'application/json;charset=utf-8');
+        toast('已导出台账 JSON（可在另一台设备导入后继续使用）');
+      });
+    }
+
+    var wipeBtn = $('lgWipeBtn');
+    if (wipeBtn) {
+      wipeBtn.addEventListener('click', function () {
+        var n = window.Ledger.list().length;
+        if (!n) { toast('台账已为空'); return; }
+        if (!window.confirm('清空全部 ' + n + ' 条台账记录（含历史版本）？建议先导出台账备份。')) return;
+        window.Ledger.clear();
+        UI.selected = {}; UI.expanded = {};
+        render();
+        toast('台账已清空');
+      });
+    }
+
+    var impBtn = $('lgImportBtn');
+    var file = $('lgFile');
+    if (impBtn && file) {
+      impBtn.addEventListener('click', function () { file.click(); });
+      file.addEventListener('change', function () {
+        var f = file.files && file.files[0];
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var res = window.Ledger.importJSON(String(reader.result || ''), 'merge');
+            render();
+            toast('台账导入完成：新增 ' + res.added + ' 条、合并 ' + res.merged + ' 条，当前共 ' + res.total + ' 条');
+          } catch (err) {
+            toast('导入失败：' + err.message);
+          }
+          file.value = '';
+        };
+        reader.readAsText(f, 'utf-8');
+      });
+    }
+  }
+
+  function download(name, content, mime) {
+    var blob = new Blob([content], { type: mime });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+  }
+
+  function toast(msg) {
+    var el = $('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.classList.remove('show'); }, 2400);
+  }
+
+  window.LedgerUI = {
+    render: render,
+    bind: bind,
+    select: function (fp) { UI.selected[fp] = 1; render(); },
+    sortBy: function (key) {
+      if (UI.sortKey === key) UI.sortDir = -UI.sortDir;
+      else { UI.sortKey = key; UI.sortDir = (key === 'name' || key === 'marketName' || key === 'evidence') ? 1 : -1; }
+      render();
+    },
+    DECISIONS: DECISIONS,
+    stamp: stamp,
+    yuan: yuan,
+    pct: pct,
+    evBadge: evBadge
+  };
+})();
+
+</script>
 <script>/* inlined: ./assets/app.js */
 // assets/app.js — 选品智能体原型：Mock 数据与交互逻辑
 (function () {
@@ -3555,6 +4363,86 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     toast('已导出《' + p.name + ' 选品分析报告》，可直接打开或转发');
   }
 
+  /* ============================ 决策台账：参数快照 ============================ */
+  // 参与证据统计的字段：这些字段若来自导入，则计入「用户导入」强度，其余计为「估算/规则库」
+  var LEDGER_TRACK = ['purchase', 'pack', 'dimL', 'dimW', 'dimH', 'weightG', 'commissionRate',
+    'acosRate', 'returnRate', 'dutyRate', 's301', 'monthlySales', 'freightMode', 'stockDays', 'payCycleDays'];
+
+  function ledgerFp(p) {
+    return window.Ledger.fingerprint({ name: p.name, profileKey: profileKeyOf(p), market: engState(p).market });
+  }
+
+  // 把当前候选产品的全部关键结论冻结成一份快照（不依赖未来规则变更）
+  function buildLedgerSnapshot(p) {
+    var es = engState(p);
+    var r = Engine.computeProfit(inputsFor(p));
+    var cls = classOfProduct(p);
+    var comp = Engine.complianceFor(es.market, cls);
+    var ip = Engine.ipRisk(p, profileOf(p));
+    var v = verdictCheck(p);
+    var imported = es.imported || {};
+    var impCount = 0;
+    LEDGER_TRACK.forEach(function (f) { if (imported[f]) impCount++; });
+    var mk = Engine.MARKETS.filter(function (m) { return m.key === es.market; })[0];
+
+    return {
+      ts: Date.now(),
+      rulesVersion: 'rules-v1 · 2026',
+      market: es.market,
+      marketName: mk ? mk.name : es.market,
+      price: r.inputs.price,
+      purchase: r.inputs.purchase,
+      pack: r.inputs.pack,
+      weightG: r.inputs.weightG,
+      dims: r.inputs.dimL + '×' + r.inputs.dimW + '×' + r.inputs.dimH + ' cm',
+      freightMode: (Engine.FREIGHT[r.inputs.freightMode] || {}).name || r.inputs.freightMode,
+      landed: r.landed,
+      vatRecoverable: r.vatRecoverable,
+      totalCost: r.totalCost,
+      profit: r.profit,
+      margin: r.margin,
+      breakevenAcos: r.breakevenAcos,
+      priceForTarget: r.priceForTarget,
+      purchaseMax: r.purchaseMax,
+      monthlyFixed: r.monthlyFixed,
+      monthlyProfit: r.monthlyProfit,
+      roi: r.roi,
+      cashTied: r.cashTied,
+      cycleDays: r.cycleDays,
+      fbaTier: r.fbaTier,
+      overall: v.overall,
+      verdictLevel: v.level,
+      verdictLabel: v.label,
+      mandatoryCompliance: comp.filter(function (c) { return c.mand; }).length,
+      complianceTotal: comp.length,
+      certCostMin: comp.reduce(function (s, c) { return s + c.cost[0]; }, 0),
+      certCostMax: comp.reduce(function (s, c) { return s + c.cost[1]; }, 0),
+      ipScore: ip.score,
+      ipLevel: ip.level,
+      highRisks: p.risks.filter(function (x) { return x.level === 'high'; }).length,
+      midRisks: p.risks.filter(function (x) { return x.level === 'mid'; }).length,
+      evidenceCount: { imp: impCount, est: LEDGER_TRACK.length - impCount },
+      manualOverrides: Object.keys(es.overrides).length,
+      imports: (es.imports || []).map(function (d) {
+        return { template: d.template, rows: d.rows, mapped: d.mapped, time: d.time };
+      })
+    };
+  }
+
+  function saveToLedger(p) {
+    var res = window.Ledger.upsert({
+      name: p.name,
+      category: p.category,
+      profileKey: profileKeyOf(p),
+      market: engState(p).market,
+      snap: buildLedgerSnapshot(p)
+    });
+    if (window.LedgerUI) window.LedgerUI.render();
+    toast(res.created
+      ? '已存入台账「' + p.name + '」· 版本 1 · 快照已冻结'
+      : '已更新台账「' + p.name + '」· 新版本 v' + res.version + ' · 旧快照已留痕');
+  }
+
   /* ============================ 汇总渲染 ============================ */
   function renderAll() {
     var p = PRODUCTS[state.index];
@@ -3573,6 +4461,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     renderRisk();
     renderRecommend();
     renderData();
+    if (window.LedgerUI) window.LedgerUI.render();
 
     $('pageTitle').textContent = '选品分析 · ' + p.name;
     var slider = $('priceRange');
@@ -3879,18 +4768,17 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
       exportReport();
     } else if (act === 'start-flow') {
       toast('已提交「' + p.name + '」进入选品流程，需先解决前置条件后再投产');
+    } else if (act === 'save-ledger') {
+      saveToLedger(p);
     } else if (act === 'compare') {
-      var tabs = $('tabs');
-      tabs.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      var first = tabs.querySelector('.tab-btn');
-      if (first) {
-        first.classList.remove('flash');
-        void first.offsetWidth;
-        first.classList.add('flash');
-      }
-      toast('请在上方候选产品 Tab 中切换对比（共 ' + PRODUCTS.length + ' 个）');
+      var rec = window.Ledger.find(ledgerFp(p));
+      if (!rec) { toast('「' + p.name + '」尚未存入台账，请先点击顶栏「存为台账」'); return; }
+      window.LedgerUI.select(rec.fp);
+      var sec = $('sec-ledger');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      toast('已选中「' + p.name + '」，请在台账中再勾选至少 1 个产品做横向对比');
     } else if (act === 'save-report') {
-      toast('分析报告已保存 · 可在「历史分析」中查看（演示）');
+      toast('报告已就绪：点顶栏「导出报告」下载 HTML，或「存为台账」把本次结论持久化留痕');
     } else if (act === 'remove-product') {
       if (PRODUCTS.length <= 1) {
         toast('至少需要保留一个候选产品');
@@ -3904,7 +4792,26 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     }
   });
 
+  /* ============================ 决策台账：跨模块联动 ============================ */
+  // 台账「查看」按钮 → 切换回对应候选产品（按名称 + 品类匹配）
+  window.XPApp = {
+    focusByFp: function (fp) {
+      var rec = window.Ledger.find(fp);
+      if (!rec) return;
+      var idx = -1;
+      for (var i = 0; i < PRODUCTS.length; i++) {
+        if (PRODUCTS[i].name === rec.name && profileKeyOf(PRODUCTS[i]) === rec.profileKey) { idx = i; break; }
+      }
+      if (idx < 0) { toast('「' + rec.name + '」不在当前候选列表中，请重新添加后查看'); return; }
+      state.index = idx;
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      toast('已切换至候选产品「' + rec.name + '」');
+    }
+  };
+
   /* ============================ 初始化 ============================ */
+  if (window.LedgerUI) window.LedgerUI.bind();
   renderAll();
 })();
 
